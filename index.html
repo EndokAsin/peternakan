@@ -47,7 +47,7 @@
                     <h1 class="text-xl font-bold text-slate-800 tracking-tight sm:hidden">Paper</h1>
                 </div>
 
-                <!-- Search Bar (New Feature) -->
+                <!-- Search Bar -->
                 <div class="flex-1 max-w-lg">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -69,6 +69,34 @@
 
     <!-- Main Content -->
     <main class="max-w-[95%] mx-auto py-8">
+        
+        <!-- Filter & Sort Toolbar -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <div class="relative w-full sm:w-48">
+                    <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm">
+                        <option value="all">Semua Status</option>
+                        <option value="Belum Diapapakan">Belum Diapapakan</option>
+                        <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
+                        <option value="Ada Masalah">Ada Masalah</option>
+                        <option value="Sudah Submit">Sudah Submit</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="relative w-full sm:w-48">
+                    <select id="sortOption" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm">
+                        <option value="deadline_asc">Deadline (Terdekat)</option>
+                        <option value="deadline_desc">Deadline (Terlama)</option>
+                        <option value="title_asc">Judul (A-Z)</option>
+                        <option value="title_desc">Judul (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="text-sm text-slate-500">
+                Total: <span id="totalCount" class="font-semibold text-slate-700">0</span> paper
+            </div>
+        </div>
         
         <!-- Loading State -->
         <div id="loading" class="text-center py-20 hidden">
@@ -108,12 +136,12 @@
                 <p class="text-slate-500 mt-1 max-w-sm">Mulai tambahkan progress paper penelitian Anda untuk melacak statusnya.</p>
             </div>
 
-            <!-- Not Found State (Search) -->
+            <!-- Not Found State (Search/Filter) -->
             <div id="notFoundState" class="hidden flex flex-col items-center justify-center py-12 text-center">
                 <div class="text-slate-300 mb-2">
-                    <i class="fa-solid fa-magnifying-glass text-3xl"></i>
+                    <i class="fa-solid fa-filter text-3xl"></i>
                 </div>
-                <p class="text-slate-500">Tidak ditemukan paper dengan kata kunci tersebut.</p>
+                <p class="text-slate-500">Tidak ada paper yang cocok dengan filter atau pencarian.</p>
             </div>
         </div>
     </main>
@@ -246,6 +274,9 @@
 
         // --- 2. STATE ---
         let papers = [];
+        let currentFilterStatus = 'all';
+        let currentSortOption = 'deadline_asc';
+        let currentSearchTerm = '';
 
         // --- 3. DOM ELEMENTS ---
         const tableBody = document.getElementById('paperTableBody');
@@ -253,12 +284,14 @@
         const emptyStateEl = document.getElementById('emptyState');
         const notFoundStateEl = document.getElementById('notFoundState');
         const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const sortOption = document.getElementById('sortOption');
+        const totalCountEl = document.getElementById('totalCount');
         const modal = document.getElementById('paperModal');
         const form = document.getElementById('paperForm');
 
         // --- 4. HELPER FUNCTIONS ---
         
-        // Logika Warna Status (Sesuai Request)
         function getStatusBadge(status) {
             const s = (status || '').toLowerCase();
             let classes = '';
@@ -266,27 +299,21 @@
             let icon = '';
 
             if (s.includes('belum')) {
-                // Abu
                 classes = 'bg-slate-100 text-slate-600 border border-slate-200';
                 icon = '<i class="fa-regular fa-clock mr-1"></i>';
             } else if (s.includes('sedang')) {
-                // Biru
                 classes = 'bg-blue-50 text-blue-700 border border-blue-200';
                 icon = '<i class="fa-solid fa-pencil mr-1"></i>';
             } else if (s.includes('masalah')) {
-                // Ungu
                 classes = 'bg-purple-50 text-purple-700 border border-purple-200';
                 icon = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>';
             } else if (s.includes('sudah submit')) {
-                // Hijau Muda (Lime)
                 classes = 'bg-lime-100 text-lime-800 border border-lime-300';
                 icon = '<i class="fa-solid fa-paper-plane mr-1"></i>';
             } else if (s.includes('accepted')) {
-                // Hijau Solid
                 classes = 'bg-green-600 text-white border border-green-700 shadow-sm';
                 icon = '<i class="fa-solid fa-check mr-1"></i>';
             } else if (s.includes('rejected')) {
-                // Merah
                 classes = 'bg-red-50 text-red-700 border border-red-200';
                 icon = '<i class="fa-solid fa-xmark mr-1"></i>';
             } else {
@@ -307,20 +334,69 @@
             return `<a href="${url}" target="_blank" title="${tooltip}" class="${colorClass} hover:opacity-75 transition z-10 relative" onclick="event.stopPropagation()"><i class="${iconClass}"></i></a>`;
         }
 
-        // --- 5. SEARCH LOGIC ---
+        // --- 5. FILTER & SORT LOGIC ---
         
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            
-            // Filter global papers array
-            const filteredPapers = papers.filter(paper => {
-                const judul = (paper.judul || '').toLowerCase();
-                const penulis = (paper.penulis || '').toLowerCase();
-                // Pencarian bisa berdasarkan judul ATAU penulis
-                return judul.includes(searchTerm) || penulis.includes(searchTerm);
+        function applyFiltersAndSort() {
+            let result = [...papers];
+
+            // 1. Filter by Search
+            if (currentSearchTerm) {
+                result = result.filter(paper => {
+                    const judul = (paper.judul || '').toLowerCase();
+                    const penulis = (paper.penulis || '').toLowerCase();
+                    return judul.includes(currentSearchTerm) || penulis.includes(currentSearchTerm);
+                });
+            }
+
+            // 2. Filter by Status
+            if (currentFilterStatus !== 'all') {
+                result = result.filter(paper => {
+                    const s = (paper.status || '').toLowerCase();
+                    const filter = currentFilterStatus.toLowerCase();
+                    return s === filter;
+                });
+            }
+
+            // 3. Sort
+            result.sort((a, b) => {
+                if (currentSortOption === 'deadline_asc') {
+                    // Handle null deadlines: push to end
+                    if (!a.deadline) return 1;
+                    if (!b.deadline) return -1;
+                    return new Date(a.deadline) - new Date(b.deadline);
+                } else if (currentSortOption === 'deadline_desc') {
+                    if (!a.deadline) return 1;
+                    if (!b.deadline) return -1;
+                    return new Date(b.deadline) - new Date(a.deadline);
+                } else if (currentSortOption === 'title_asc') {
+                    const titleA = (a.judul || '').toLowerCase();
+                    const titleB = (b.judul || '').toLowerCase();
+                    return titleA.localeCompare(titleB);
+                } else if (currentSortOption === 'title_desc') {
+                    const titleA = (a.judul || '').toLowerCase();
+                    const titleB = (b.judul || '').toLowerCase();
+                    return titleB.localeCompare(titleA);
+                }
+                return 0;
             });
 
-            renderTable(filteredPapers);
+            renderTable(result);
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', (e) => {
+            currentSearchTerm = e.target.value.toLowerCase();
+            applyFiltersAndSort();
+        });
+
+        statusFilter.addEventListener('change', (e) => {
+            currentFilterStatus = e.target.value;
+            applyFiltersAndSort();
+        });
+
+        sortOption.addEventListener('change', (e) => {
+            currentSortOption = e.target.value;
+            applyFiltersAndSort();
         });
 
         // --- 6. CORE FUNCTIONS ---
@@ -334,6 +410,7 @@
             const { data, error } = await db
                 .from('papers')
                 .select('*')
+                // Default order fetch, but client side sort will override
                 .order('deadline', { ascending: true });
 
             loadingEl.classList.add('hidden');
@@ -345,26 +422,30 @@
             }
 
             papers = data || [];
-            // Reset search input on reload/fetch
+            
+            // Reset filters on full fetch
             searchInput.value = '';
-            renderTable(papers);
+            currentSearchTerm = '';
+            // Note: We keep sort and status filter preference from UI
+            
+            applyFiltersAndSort();
         }
 
-        // Modified renderTable to accept data argument
         function renderTable(dataToRender) {
             tableBody.innerHTML = '';
+            totalCountEl.textContent = dataToRender.length;
             
-            // Hide all empty/not found states first
+            // Hide states
             emptyStateEl.classList.add('hidden');
             notFoundStateEl.classList.add('hidden');
 
-            // Scenario 1: No data in database at all
+            // Scenario 1: No data in DB
             if (papers.length === 0) {
                 emptyStateEl.classList.remove('hidden');
                 return;
             }
 
-            // Scenario 2: Data exists in DB, but search result is empty
+            // Scenario 2: Data in DB but Filter returns empty
             if (dataToRender.length === 0) {
                 notFoundStateEl.classList.remove('hidden');
                 return;
