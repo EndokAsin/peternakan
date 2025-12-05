@@ -71,10 +71,11 @@
     <main class="max-w-[95%] mx-auto py-8">
         
         <!-- Filter & Sort Toolbar -->
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-            <div class="flex items-center gap-2 w-full sm:w-auto">
+        <div class="flex flex-col xl:flex-row justify-between items-center mb-4 gap-4">
+            <div class="flex flex-col sm:flex-row items-center gap-2 w-full xl:w-auto">
+                <!-- Filter Status -->
                 <div class="relative w-full sm:w-48">
-                    <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm">
+                    <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
                         <option value="all">Semua Status</option>
                         <option value="Belum Diapapakan">Belum Diapapakan</option>
                         <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
@@ -84,8 +85,18 @@
                         <option value="Rejected">Rejected</option>
                     </select>
                 </div>
+
+                <!-- Filter Kategori (NEW) -->
                 <div class="relative w-full sm:w-48">
-                    <select id="sortOption" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm">
+                    <select id="categoryFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
+                        <option value="all">Semua Kategori</option>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Sort Option -->
+                <div class="relative w-full sm:w-48">
+                    <select id="sortOption" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
                         <option value="deadline_asc">Deadline (Terdekat)</option>
                         <option value="deadline_desc">Deadline (Terlama)</option>
                         <option value="title_asc">Judul (A-Z)</option>
@@ -93,7 +104,7 @@
                     </select>
                 </div>
             </div>
-            <div class="text-sm text-slate-500">
+            <div class="text-sm text-slate-500 whitespace-nowrap">
                 Total: <span id="totalCount" class="font-semibold text-slate-700">0</span> paper
             </div>
         </div>
@@ -275,6 +286,7 @@
         // --- 2. STATE ---
         let papers = [];
         let currentFilterStatus = 'all';
+        let currentFilterCategory = 'all'; // New State
         let currentSortOption = 'deadline_asc';
         let currentSearchTerm = '';
 
@@ -285,6 +297,7 @@
         const notFoundStateEl = document.getElementById('notFoundState');
         const searchInput = document.getElementById('searchInput');
         const statusFilter = document.getElementById('statusFilter');
+        const categoryFilter = document.getElementById('categoryFilter'); // New Element
         const sortOption = document.getElementById('sortOption');
         const totalCountEl = document.getElementById('totalCount');
         const modal = document.getElementById('paperModal');
@@ -334,6 +347,32 @@
             return `<a href="${url}" target="_blank" title="${tooltip}" class="${colorClass} hover:opacity-75 transition z-10 relative" onclick="event.stopPropagation()"><i class="${iconClass}"></i></a>`;
         }
 
+        // New function to dynamically populate categories based on loaded data
+        function populateCategoryFilter() {
+            // Extract unique categories, remove null/empty
+            const categories = [...new Set(papers.map(p => p.kategori).filter(k => k && k.trim() !== ''))];
+            categories.sort(); // Sort alphabetically
+
+            // Keep "Semua Kategori" and reset options
+            categoryFilter.innerHTML = '<option value="all">Semua Kategori</option>';
+
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                categoryFilter.appendChild(option);
+            });
+            
+            // Restore selection if previously selected category still exists
+            categoryFilter.value = currentFilterCategory;
+            
+            // If current selection is no longer valid (e.g. data deleted), reset to 'all'
+            if (categoryFilter.value !== currentFilterCategory) {
+                currentFilterCategory = 'all';
+                categoryFilter.value = 'all';
+            }
+        }
+
         // --- 5. FILTER & SORT LOGIC ---
         
         function applyFiltersAndSort() {
@@ -357,7 +396,14 @@
                 });
             }
 
-            // 3. Sort
+            // 3. Filter by Category (New)
+            if (currentFilterCategory !== 'all') {
+                result = result.filter(paper => {
+                    return paper.kategori === currentFilterCategory;
+                });
+            }
+
+            // 4. Sort
             result.sort((a, b) => {
                 if (currentSortOption === 'deadline_asc') {
                     // Handle null deadlines: push to end
@@ -393,6 +439,12 @@
             currentFilterStatus = e.target.value;
             applyFiltersAndSort();
         });
+        
+        // Listener for Category Filter
+        categoryFilter.addEventListener('change', (e) => {
+            currentFilterCategory = e.target.value;
+            applyFiltersAndSort();
+        });
 
         sortOption.addEventListener('change', (e) => {
             currentSortOption = e.target.value;
@@ -423,10 +475,13 @@
 
             papers = data || [];
             
+            // Populate category dropdown based on fetched data
+            populateCategoryFilter();
+
             // Reset filters on full fetch
             searchInput.value = '';
             currentSearchTerm = '';
-            // Note: We keep sort and status filter preference from UI
+            // Note: We keep sort and status/category filter preference from UI
             
             applyFiltersAndSort();
         }
