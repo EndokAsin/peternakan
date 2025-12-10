@@ -3,682 +3,790 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Peternakan Paper</title>
-    <!-- Tailwind CSS -->
+    <title>Eksperimen Motor Imagery & Execution</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS -->
+    <!-- IMPORT SUPABASE LIBRARY -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Font Awesome untuk Ikon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        
-        /* Custom Scrollbar untuk tabel */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a202c; /* Dark background for focus */
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
-        .custom-scroll::-webkit-scrollbar {
+        .center-absolute {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+        }
+        .fixation-cross {
+            font-size: 5rem;
+            font-weight: bold;
+            color: white;
+        }
+        /* Custom scrollbar for table */
+        ::-webkit-scrollbar {
+            width: 8px;
             height: 8px;
         }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1; 
+        ::-webkit-scrollbar-track {
+            background: #2d3748; 
         }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #c1c1c1; 
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; 
             border-radius: 4px;
         }
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8; 
+        ::-webkit-scrollbar-thumb:hover {
+            background: #718096; 
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
 
-    <!-- Navbar -->
-    <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16 gap-4">
-                <!-- Logo -->
-                <div class="flex items-center gap-3 flex-shrink-0">
-                    <i class="fa-solid fa-cow text-blue-600 text-2xl"></i>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight hidden sm:block">Peternakan Paper</h1>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight sm:hidden">Paper</h1>
+    <!-- HALAMAN SETUP (Awal) -->
+    <div id="setup-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-700">
+            <h1 class="text-2xl font-bold mb-6 text-center text-blue-400">Konfigurasi Eksperimen</h1>
+            
+            <form id="config-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nama / ID Peserta</label>
+                    <input type="text" id="subject-id" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-blue-500 focus:outline-none" placeholder="Contoh: Peserta 01">
                 </div>
 
-                <!-- Search Bar -->
-                <div class="flex-1 max-w-lg">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-search text-slate-400"></i>
-                        </div>
-                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-500 focus:outline-none focus:bg-white focus:placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Cari judul paper atau penulis...">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Tangan yang Diuji</label>
+                    <select id="hand-selection" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-blue-500 focus:outline-none">
+                        <option value="Kanan">Tangan Kanan (Right Hand)</option>
+                        <option value="Kiri">Tangan Kiri (Left Hand)</option>
+                    </select>
                 </div>
 
-                <!-- Action Button -->
-                <div class="flex items-center flex-shrink-0">
-                    <button onclick="openModal(); event.stopPropagation()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-blue-500/30 flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tambah Paper</span>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Jenis Sesi</label>
+                    <select id="session-type" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-blue-500 focus:outline-none">
+                        <option value="ME_Latihan" data-trials="5" data-mode="ME">Latihan Motor Execution (5 Percobaan)</option>
+                        <option value="ME_Utama" data-trials="15" data-mode="ME">Utama Motor Execution (15 Percobaan)</option>
+                        <option value="MI_Latihan" data-trials="5" data-mode="MI">Latihan Motor Imagery (5 Percobaan)</option>
+                        <option value="MI_Utama" data-trials="15" data-mode="MI">Utama Motor Imagery (15 Percobaan)</option>
+                        <option value="Custom_20" data-trials="20" data-mode="ME">Custom Full Session (20 Percobaan - ME)</option>
+                    </select>
+                </div>
+
+                <div class="pt-4 space-y-3">
+                    <button type="submit" id="btn-start" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                        Mulai Sesi
+                    </button>
+                    <button type="button" onclick="openDataScreen()" class="w-full bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-2 px-4 rounded transition duration-200 border border-gray-600">
+                        📂 Lihat & Kelola Data
                     </button>
                 </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="max-w-[95%] mx-auto py-8">
-        
-        <!-- Filter & Sort Toolbar -->
-        <div class="flex flex-col xl:flex-row justify-between items-center mb-4 gap-4">
-            <div class="flex flex-col sm:flex-row items-center gap-2 w-full xl:w-auto">
-                <!-- Filter Status -->
-                <div class="relative w-full sm:w-48">
-                    <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
-                        <option value="all">Semua Status</option>
-                        <option value="Belum Diapapakan">Belum Diapapakan</option>
-                        <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-                        <option value="Ada Masalah">Ada Masalah</option>
-                        <option value="Sudah Submit">Sudah Submit</option>
-                        <option value="Accepted">Accepted</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
-                </div>
-
-                <!-- Filter Kategori (NEW) -->
-                <div class="relative w-full sm:w-48">
-                    <select id="categoryFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
-                        <option value="all">Semua Kategori</option>
-                        <!-- Options will be populated dynamically -->
-                    </select>
-                </div>
-
-                <!-- Sort Option -->
-                <div class="relative w-full sm:w-48">
-                    <select id="sortOption" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
-                        <option value="deadline_asc">Deadline (Terdekat)</option>
-                        <option value="deadline_desc">Deadline (Terlama)</option>
-                        <option value="title_asc">Judul (A-Z)</option>
-                        <option value="title_desc">Judul (Z-A)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="text-sm text-slate-500 whitespace-nowrap">
-                Total: <span id="totalCount" class="font-semibold text-slate-700">0</span> paper
-            </div>
-        </div>
-        
-        <!-- Loading State -->
-        <div id="loading" class="text-center py-20 hidden">
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
-            <p class="mt-4 text-slate-500">Memuat data ternak...</p>
-        </div>
-
-        <!-- Table Container -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
-            <div class="overflow-x-auto custom-scroll pb-4">
-                <table class="w-full text-sm text-left">
-                    <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200">
-                        <tr>
-                            <th scope="col" class="px-4 py-3 min-w-[100px]">Deadline</th>
-                            <th scope="col" class="px-4 py-3 min-w-[150px]">Penulis</th>
-                            <th scope="col" class="px-4 py-3 min-w-[250px]">Judul Paper</th>
-                            <th scope="col" class="px-4 py-3 min-w-[150px]">Status</th>
-                            <th scope="col" class="px-4 py-3 min-w-[150px]">Target Jurnal</th>
-                            <th scope="col" class="px-4 py-3 min-w-[100px]">Links</th>
-                            <th scope="col" class="px-4 py-3 min-w-[100px]">Biaya</th>
-                            <th scope="col" class="px-4 py-3 min-w-[200px]">Catatan</th>
-                            <th scope="col" class="px-4 py-3 min-w-[100px] text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="paperTableBody" class="divide-y divide-slate-100">
-                        <!-- Data will be injected here -->
-                    </tbody>
-                </table>
-            </div>
+            </form>
             
-            <!-- Empty State -->
-            <div id="emptyState" class="hidden flex flex-col items-center justify-center py-16 text-center">
-                <div class="bg-slate-100 p-4 rounded-full mb-4">
-                    <i class="fa-regular fa-folder-open text-3xl text-slate-400"></i>
-                </div>
-                <h3 class="text-lg font-medium text-slate-900">Belum ada paper</h3>
-                <p class="text-slate-500 mt-1 max-w-sm">Mulai tambahkan progress paper penelitian Anda untuk melacak statusnya.</p>
+            <div id="loading-msg" class="hidden mt-4 text-xs text-yellow-400 text-center animate-pulse">
+                Mengecek riwayat sesi sebelumnya untuk sinkronisasi...
             </div>
-
-            <!-- Not Found State (Search/Filter) -->
-            <div id="notFoundState" class="hidden flex flex-col items-center justify-center py-12 text-center">
-                <div class="text-slate-300 mb-2">
-                    <i class="fa-solid fa-filter text-3xl"></i>
-                </div>
-                <p class="text-slate-500">Tidak ada paper yang cocok dengan filter atau pencarian.</p>
-            </div>
-        </div>
-    </main>
-
-    <!-- Modal Form -->
-    <div id="paperModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
-        <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
-                    
-                    <!-- Modal Header -->
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-lg font-semibold leading-6 text-slate-900" id="modalTitle">Tambah Paper Baru</h3>
-                            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-500">
-                                <i class="fa-solid fa-xmark text-xl"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Modal Body -->
-                    <form id="paperForm" class="p-6">
-                        <input type="hidden" id="paperId">
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Kolom Kiri -->
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Judul Paper *</label>
-                                    <input type="text" id="judul" required class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                </div>
-                                
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Deadline</label>
-                                        <input type="date" id="deadline" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Status *</label>
-                                        <select id="status" required class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                            <option value="Belum Diapapakan">Belum Diapapakan (Pending)</option>
-                                            <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-                                            <option value="Ada Masalah">Ada Masalah</option>
-                                            <option value="Sudah Submit">Sudah Submit</option>
-                                            <option value="Accepted">Accepted</option>
-                                            <option value="Rejected">Rejected</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Target Jurnal / Conference</label>
-                                    <input type="text" id="target_jurnal" placeholder="e.g. IEEE Access, Q1" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Penulis</label>
-                                    <input type="text" id="penulis" placeholder="e.g. MIB, MBG, MMR" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                </div>
-                            </div>
-
-                            <!-- Kolom Kanan -->
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Tautan Penting</label>
-                                    <div class="space-y-2">
-                                        <input type="url" id="link_overleaf" placeholder="Link Overleaf" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_referensi" placeholder="Link Referensi" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_ppt" placeholder="Link PPT/Canva" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_submission" placeholder="Link Submission" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Biaya</label>
-                                        <input type="text" id="biaya" placeholder="$0.00" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Kategori</label>
-                                        <input type="text" id="kategori" placeholder="e.g. Q2" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Catatan Penting</label>
-                                    <textarea id="catatan" rows="2" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Technical Fields (Hidden/Collapsed UI simplified for MVP) -->
-                        <div class="mt-4 grid grid-cols-2 gap-4">
-                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Mapping</label>
-                                <input type="text" id="mapping" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                             </div>
-                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Consensus</label>
-                                <input type="text" id="consensus" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                             </div>
-                        </div>
-
-                        <div class="mt-6 flex justify-end gap-3">
-                            <button type="button" onclick="closeModal()" class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none">Batal</button>
-                            <button type="submit" id="saveBtn" class="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Simpan</button>
-                        </div>
-                    </form>
-                </div>
+            <div class="mt-4 text-xs text-gray-500 text-center">
+                Data disimpan per sesi (Ringkas).
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 transition-transform duration-300 z-50">
-        <div class="bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
-            <i class="fa-solid fa-circle-check text-green-400"></i>
-            <span id="toastMessage">Berhasil disimpan</span>
+    <!-- HALAMAN DATA (Tabel Hasil - RINGKAS) -->
+    <div id="data-screen" class="hidden min-h-screen p-6 bg-gray-900">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-blue-400">Manajemen Data Eksperimen</h2>
+                    <p class="text-gray-400 text-sm">Hapus data dengan hati-hati. Data yang dihapus tidak dapat dikembalikan.</p>
+                </div>
+                <div class="flex gap-3">
+                    <!-- Tombol Download All -->
+                    <button onclick="downloadAllHistoryCSV()" class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2 border border-green-600 shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Unduh Semua (.csv)</span>
+                    </button>
+                    
+                    <button onclick="switchScreen('setup')" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded flex items-center gap-2 border border-gray-600">
+                        <span>← Kembali</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden">
+                <div class="overflow-x-auto max-h-[80vh]">
+                    <table class="w-full text-left text-sm text-gray-300">
+                        <thead class="bg-gray-700 text-gray-100 uppercase sticky top-0 z-10">
+                            <tr>
+                                <th class="p-4">Waktu</th>
+                                <th class="p-4">Jenis Sesi</th>
+                                <th class="p-4">Mode</th>
+                                <th class="p-4">Tangan</th>
+                                <th class="p-4 text-center">Jml Trial</th>
+                                <th class="p-4 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body" class="divide-y divide-gray-700">
+                            <tr>
+                                <td colspan="6" class="p-8 text-center text-gray-500">Memuat data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <p class="mt-2 text-xs text-gray-500 text-right">* Menampilkan riwayat sesi.</p>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL (Hidden by default) -->
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-gray-600">
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-gray-900 rounded-t-lg">
+                <h3 class="text-xl font-bold text-blue-400">Rincian Trial Sesi</h3>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
+            </div>
+            
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-1">
+                <!-- Info Header Sesi -->
+                <div id="modal-session-info" class="mb-6 grid grid-cols-2 gap-4 text-sm bg-gray-700 p-4 rounded border border-gray-600">
+                    <!-- Diisi via JS -->
+                </div>
+
+                <h4 class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Log Trial</h4>
+                <div class="overflow-hidden rounded border border-gray-700">
+                    <table class="w-full text-left text-sm text-gray-300">
+                        <thead class="bg-gray-900 text-gray-100">
+                            <tr>
+                                <th class="p-3 w-16 text-center">No</th>
+                                <th class="p-3">Instruksi</th>
+                                <th class="p-3 text-right">Waktu Aksi (Main)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-trial-list" class="divide-y divide-gray-700 bg-gray-800">
+                            <!-- Diisi via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-gray-700 text-right bg-gray-900 rounded-b-lg">
+                <button onclick="closeDetailModal()" class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded font-medium transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN EKSPERIMEN (Running) -->
+    <div id="experiment-screen" class="hidden h-screen w-screen relative bg-black">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gray-800">
+            <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div class="absolute top-2 right-4 text-gray-500 text-sm">
+            Trial: <span id="trial-counter">0</span>/<span id="total-trials">0</span>
+        </div>
+
+        <div class="center-absolute">
+            <div id="fixation" class="hidden">
+                <div class="fixation-cross">+</div>
+            </div>
+            <div id="instruction" class="hidden">
+                <img id="instruction-img" src="" alt="Instruksi" class="mx-auto h-64 object-contain mb-4 rounded-lg border-2 border-gray-600">
+                <h2 id="instruction-text" class="text-3xl font-bold text-yellow-400 uppercase tracking-wider"></h2>
+            </div>
+            <div id="action-phase" class="hidden">
+                <div class="w-32 h-32 rounded-full border-4 border-green-500 flex items-center justify-center mx-auto mb-6 bg-green-900 bg-opacity-20 animate-pulse">
+                    <span class="text-4xl font-bold text-green-400">GO</span>
+                </div>
+                <h2 id="action-text" class="text-4xl font-bold text-white uppercase"></h2>
+            </div>
+            <div id="rest-phase" class="hidden">
+                <h2 class="text-2xl text-gray-400 mb-2">Istirahat</h2>
+                <div class="text-6xl font-mono" id="rest-timer">5</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN SELESAI (Result) -->
+    <div id="result-screen" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg text-center border border-gray-700">
+            <h2 class="text-3xl font-bold text-green-400 mb-4">Sesi Selesai</h2>
+            
+            <div id="upload-status" class="mb-6 p-3 bg-gray-700 rounded text-sm text-yellow-300">
+                Menyimpan data sesi ke Cloud...
+            </div>
+
+            <p class="mb-6 text-gray-400 text-sm">Seluruh data percobaan dalam sesi ini telah disatukan.</p>
+            
+            <div class="space-y-3">
+                <button onclick="downloadCSV()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Unduh CSV Lengkap
+                </button>
+                <button onclick="location.reload()" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                    Kembali ke Menu Utama
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
-        const SUPABASE_URL = 'https://dinaiaavuwyctqjvsgxf.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpbmFpYWF2dXd5Y3RxanZzZ3hmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4MzA1MTMsImV4cCI6MjA4MDQwNjUxM30.lk44ea1QuggX2Sh1UCZL9PvvXIqBs0YpmK8Lf3E3Mqo';
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = 'https://rkekwnmwuybxzmbptcwh.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_5p4UmkOLs41OWf97B-He4g_A2MRqC7T'; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- KONFIGURASI GAMBAR ---
+        const IMG_EXTENSION = "https://rkekwnmwuybxzmbptcwh.supabase.co/storage/v1/object/public/assets/Untitled%20design%20(7).png";
+        const IMG_FLEXION = "https://rkekwnmwuybxzmbptcwh.supabase.co/storage/v1/object/public/assets/Untitled%20design%20(8).png";
+
+        // --- STATE ---
+        let config = {
+            id: "",
+            hand: "",
+            sessionName: "",
+            mode: "", 
+            totalTrials: 0
+        };
+
+        let trials = []; 
+        let currentTrialIndex = 0;
+        let logs = []; 
+        let fetchedSessions = [];
+
+        // --- DOM ELEMENTS ---
+        const screens = {
+            setup: document.getElementById('setup-screen'),
+            experiment: document.getElementById('experiment-screen'),
+            result: document.getElementById('result-screen'),
+            data: document.getElementById('data-screen')
+        };
         
-        const { createClient } = supabase;
-        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const phases = {
+            fixation: document.getElementById('fixation'),
+            instruction: document.getElementById('instruction'),
+            action: document.getElementById('action-phase'),
+            rest: document.getElementById('rest-phase')
+        };
 
-        // --- 2. STATE ---
-        let papers = [];
-        let currentFilterStatus = 'all';
-        let currentFilterCategory = 'all'; // New State
-        let currentSortOption = 'deadline_asc';
-        let currentSearchTerm = '';
+        const elements = {
+            trialCounter: document.getElementById('trial-counter'),
+            totalTrials: document.getElementById('total-trials'),
+            progressBar: document.getElementById('progress-bar'),
+            instructionImg: document.getElementById('instruction-img'),
+            instructionText: document.getElementById('instruction-text'),
+            actionText: document.getElementById('action-text'),
+            restTimer: document.getElementById('rest-timer'),
+            uploadStatus: document.getElementById('upload-status'),
+            dataTableBody: document.getElementById('data-table-body'),
+            modal: document.getElementById('detail-modal'),
+            modalInfo: document.getElementById('modal-session-info'),
+            modalList: document.getElementById('modal-trial-list'),
+            loadingMsg: document.getElementById('loading-msg'),
+            btnStart: document.getElementById('btn-start')
+        };
 
-        // --- 3. DOM ELEMENTS ---
-        const tableBody = document.getElementById('paperTableBody');
-        const loadingEl = document.getElementById('loading');
-        const emptyStateEl = document.getElementById('emptyState');
-        const notFoundStateEl = document.getElementById('notFoundState');
-        const searchInput = document.getElementById('searchInput');
-        const statusFilter = document.getElementById('statusFilter');
-        const categoryFilter = document.getElementById('categoryFilter'); // New Element
-        const sortOption = document.getElementById('sortOption');
-        const totalCountEl = document.getElementById('totalCount');
-        const modal = document.getElementById('paperModal');
-        const form = document.getElementById('paperForm');
-
-        // --- 4. HELPER FUNCTIONS ---
-        
-        function getStatusBadge(status) {
-            const s = (status || '').toLowerCase();
-            let classes = '';
-            let label = status || '-';
-            let icon = '';
-
-            if (s.includes('belum')) {
-                classes = 'bg-slate-100 text-slate-600 border border-slate-200';
-                icon = '<i class="fa-regular fa-clock mr-1"></i>';
-            } else if (s.includes('sedang')) {
-                classes = 'bg-blue-50 text-blue-700 border border-blue-200';
-                icon = '<i class="fa-solid fa-pencil mr-1"></i>';
-            } else if (s.includes('masalah')) {
-                classes = 'bg-purple-50 text-purple-700 border border-purple-200';
-                icon = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>';
-            } else if (s.includes('sudah submit')) {
-                classes = 'bg-lime-100 text-lime-800 border border-lime-300';
-                icon = '<i class="fa-solid fa-paper-plane mr-1"></i>';
-            } else if (s.includes('accepted')) {
-                classes = 'bg-green-600 text-white border border-green-700 shadow-sm';
-                icon = '<i class="fa-solid fa-check mr-1"></i>';
-            } else if (s.includes('rejected')) {
-                classes = 'bg-red-50 text-red-700 border border-red-200';
-                icon = '<i class="fa-solid fa-xmark mr-1"></i>';
-            } else {
-                classes = 'bg-slate-50 text-slate-500';
-            }
-
-            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${classes}">${icon}${label}</span>`;
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
-        }
-
-        function generateLinkIcon(url, iconClass, colorClass, tooltip) {
-            if (!url) return `<span class="text-slate-200"><i class="${iconClass}"></i></span>`;
-            return `<a href="${url}" target="_blank" title="${tooltip}" class="${colorClass} hover:opacity-75 transition z-10 relative" onclick="event.stopPropagation()"><i class="${iconClass}"></i></a>`;
-        }
-
-        // New function to dynamically populate categories based on loaded data
-        function populateCategoryFilter() {
-            // Extract unique categories, remove null/empty
-            const categories = [...new Set(papers.map(p => p.kategori).filter(k => k && k.trim() !== ''))];
-            categories.sort(); // Sort alphabetically
-
-            // Keep "Semua Kategori" and reset options
-            categoryFilter.innerHTML = '<option value="all">Semua Kategori</option>';
-
-            categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                categoryFilter.appendChild(option);
-            });
-            
-            // Restore selection if previously selected category still exists
-            categoryFilter.value = currentFilterCategory;
-            
-            // If current selection is no longer valid (e.g. data deleted), reset to 'all'
-            if (categoryFilter.value !== currentFilterCategory) {
-                currentFilterCategory = 'all';
-                categoryFilter.value = 'all';
-            }
-        }
-
-        // --- 5. FILTER & SORT LOGIC ---
-        
-        function applyFiltersAndSort() {
-            let result = [...papers];
-
-            // 1. Filter by Search
-            if (currentSearchTerm) {
-                result = result.filter(paper => {
-                    const judul = (paper.judul || '').toLowerCase();
-                    const penulis = (paper.penulis || '').toLowerCase();
-                    return judul.includes(currentSearchTerm) || penulis.includes(currentSearchTerm);
-                });
-            }
-
-            // 2. Filter by Status
-            if (currentFilterStatus !== 'all') {
-                result = result.filter(paper => {
-                    const s = (paper.status || '').toLowerCase();
-                    const filter = currentFilterStatus.toLowerCase();
-                    return s === filter;
-                });
-            }
-
-            // 3. Filter by Category (New)
-            if (currentFilterCategory !== 'all') {
-                result = result.filter(paper => {
-                    return paper.kategori === currentFilterCategory;
-                });
-            }
-
-            // 4. Sort
-            result.sort((a, b) => {
-                if (currentSortOption === 'deadline_asc') {
-                    // Handle null deadlines: push to end
-                    if (!a.deadline) return 1;
-                    if (!b.deadline) return -1;
-                    return new Date(a.deadline) - new Date(b.deadline);
-                } else if (currentSortOption === 'deadline_desc') {
-                    if (!a.deadline) return 1;
-                    if (!b.deadline) return -1;
-                    return new Date(b.deadline) - new Date(a.deadline);
-                } else if (currentSortOption === 'title_asc') {
-                    const titleA = (a.judul || '').toLowerCase();
-                    const titleB = (b.judul || '').toLowerCase();
-                    return titleA.localeCompare(titleB);
-                } else if (currentSortOption === 'title_desc') {
-                    const titleA = (a.judul || '').toLowerCase();
-                    const titleB = (b.judul || '').toLowerCase();
-                    return titleB.localeCompare(titleA);
-                }
-                return 0;
-            });
-
-            renderTable(result);
-        }
-
-        // Event Listeners
-        searchInput.addEventListener('input', (e) => {
-            currentSearchTerm = e.target.value.toLowerCase();
-            applyFiltersAndSort();
-        });
-
-        statusFilter.addEventListener('change', (e) => {
-            currentFilterStatus = e.target.value;
-            applyFiltersAndSort();
-        });
-        
-        // Listener for Category Filter
-        categoryFilter.addEventListener('change', (e) => {
-            currentFilterCategory = e.target.value;
-            applyFiltersAndSort();
-        });
-
-        sortOption.addEventListener('change', (e) => {
-            currentSortOption = e.target.value;
-            applyFiltersAndSort();
-        });
-
-        // --- 6. CORE FUNCTIONS ---
-
-        async function fetchPapers() {
-            loadingEl.classList.remove('hidden');
-            tableBody.innerHTML = '';
-            emptyStateEl.classList.add('hidden');
-            notFoundStateEl.classList.add('hidden');
-
-            const { data, error } = await db
-                .from('papers')
-                .select('*')
-                // Default order fetch, but client side sort will override
-                .order('deadline', { ascending: true });
-
-            loadingEl.classList.add('hidden');
-
-            if (error) {
-                console.error('Error fetching:', error);
-                showToast('Gagal mengambil data. Pastikan tabel database sudah dibuat.', 'error');
-                return;
-            }
-
-            papers = data || [];
-            
-            // Populate category dropdown based on fetched data
-            populateCategoryFilter();
-
-            // Reset filters on full fetch
-            searchInput.value = '';
-            currentSearchTerm = '';
-            // Note: We keep sort and status/category filter preference from UI
-            
-            applyFiltersAndSort();
-        }
-
-        function renderTable(dataToRender) {
-            tableBody.innerHTML = '';
-            totalCountEl.textContent = dataToRender.length;
-            
-            // Hide states
-            emptyStateEl.classList.add('hidden');
-            notFoundStateEl.classList.add('hidden');
-
-            // Scenario 1: No data in DB
-            if (papers.length === 0) {
-                emptyStateEl.classList.remove('hidden');
-                return;
-            }
-
-            // Scenario 2: Data in DB but Filter returns empty
-            if (dataToRender.length === 0) {
-                notFoundStateEl.classList.remove('hidden');
-                return;
-            }
-
-            dataToRender.forEach(paper => {
-                const row = document.createElement('tr');
-                row.className = 'bg-white border-b border-slate-100 hover:bg-blue-50 transition-colors cursor-pointer group relative';
-                row.onclick = () => editPaper(paper.id);
-                row.title = "Klik baris untuk mengedit paper";
-                
-                const linksHtml = `
-                    <div class="flex gap-3 text-lg" onclick="event.stopPropagation()">
-                        ${generateLinkIcon(paper.link_overleaf, 'fa-solid fa-file-code', 'text-green-600', 'Overleaf')}
-                        ${generateLinkIcon(paper.link_referensi, 'fa-solid fa-book', 'text-blue-500', 'Referensi')}
-                        ${generateLinkIcon(paper.link_ppt, 'fa-solid fa-file-powerpoint', 'text-orange-500', 'PPT/Canva')}
-                        ${generateLinkIcon(paper.link_submission, 'fa-solid fa-upload', 'text-purple-500', 'Submission')}
-                    </div>
-                `;
-
-                row.innerHTML = `
-                    <td class="px-4 py-4 font-mono text-xs text-slate-500 whitespace-nowrap">
-                        ${formatDate(paper.deadline)}
-                    </td>
-                    <td class="px-4 py-4 text-slate-600 text-xs">
-                        ${paper.penulis || '-'}
-                    </td>
-                    <td class="px-4 py-4 font-medium text-slate-900">
-                        ${paper.judul || 'Tanpa Judul'}
-                        <div class="text-xs text-slate-400 font-normal mt-0.5">${paper.kategori || ''}</div>
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
-                        ${getStatusBadge(paper.status)}
-                    </td>
-                    <td class="px-4 py-4 text-slate-600 text-xs">
-                        ${paper.target_jurnal || '-'}
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap relative z-10">
-                        ${linksHtml}
-                    </td>
-                    <td class="px-4 py-4 text-slate-600 text-xs font-mono">
-                        ${paper.biaya || '-'}
-                    </td>
-                    <td class="px-4 py-4 text-slate-500 text-xs italic max-w-xs truncate" title="${paper.catatan || ''}">
-                        ${paper.catatan || '-'}
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap text-center relative z-10" onclick="event.stopPropagation()">
-                        <button onclick="editPaper(${paper.id})" class="text-blue-600 hover:text-blue-900 mx-1 p-1 rounded hover:bg-blue-100 transition"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deletePaper(${paper.id})" class="text-red-400 hover:text-red-700 mx-1 p-1 rounded hover:bg-red-100 transition"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        // --- 7. MODAL & FORM LOGIC ---
-
-        function openModal(isEdit = false) {
-            modal.classList.remove('hidden');
-            if (!isEdit) {
-                document.getElementById('modalTitle').textContent = 'Tambah Paper Baru';
-                form.reset();
-                document.getElementById('paperId').value = '';
-                document.getElementById('status').value = 'Belum Diapapakan';
-            } else {
-                document.getElementById('modalTitle').textContent = 'Edit Paper';
-            }
-        }
-
-        function closeModal() {
-            modal.classList.add('hidden');
-        }
-
-        function editPaper(id) {
-            const paper = papers.find(p => p.id === id);
-            if (!paper) return;
-
-            document.getElementById('paperId').value = paper.id;
-            document.getElementById('judul').value = paper.judul || '';
-            document.getElementById('deadline').value = paper.deadline || '';
-            document.getElementById('status').value = paper.status || 'Belum Diapapakan';
-            document.getElementById('target_jurnal').value = paper.target_jurnal || '';
-            document.getElementById('penulis').value = paper.penulis || '';
-            document.getElementById('link_overleaf').value = paper.link_overleaf || '';
-            document.getElementById('link_referensi').value = paper.link_referensi || '';
-            document.getElementById('link_ppt').value = paper.link_ppt || '';
-            document.getElementById('link_submission').value = paper.link_submission || '';
-            document.getElementById('biaya').value = paper.biaya || '';
-            document.getElementById('kategori').value = paper.kategori || '';
-            document.getElementById('catatan').value = paper.catatan || '';
-            document.getElementById('mapping').value = paper.mapping || '';
-            document.getElementById('consensus').value = paper.consensus || '';
-
-            openModal(true);
-        }
-
-        form.addEventListener('submit', async (e) => {
+        // --- HANDLERS ---
+        document.getElementById('config-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            const saveBtn = document.getElementById('saveBtn');
-            const originalBtnText = saveBtn.innerText;
-            saveBtn.innerText = 'Menyimpan...';
-            saveBtn.disabled = true;
+            const selectEl = document.getElementById('session-type');
+            const selectedOption = selectEl.options[selectEl.selectedIndex];
 
-            const id = document.getElementById('paperId').value;
-            
-            const formData = {
-                judul: document.getElementById('judul').value,
-                deadline: document.getElementById('deadline').value || null,
-                status: document.getElementById('status').value,
-                target_jurnal: document.getElementById('target_jurnal').value,
-                penulis: document.getElementById('penulis').value,
-                link_overleaf: document.getElementById('link_overleaf').value,
-                link_referensi: document.getElementById('link_referensi').value,
-                link_ppt: document.getElementById('link_ppt').value,
-                link_submission: document.getElementById('link_submission').value,
-                biaya: document.getElementById('biaya').value,
-                kategori: document.getElementById('kategori').value,
-                catatan: document.getElementById('catatan').value,
-                mapping: document.getElementById('mapping').value,
-                consensus: document.getElementById('consensus').value,
-            };
+            config.id = document.getElementById('subject-id').value;
+            config.hand = document.getElementById('hand-selection').value;
+            config.sessionName = selectEl.value;
+            config.totalTrials = parseInt(selectedOption.getAttribute('data-trials'));
+            config.mode = selectedOption.getAttribute('data-mode');
 
-            let error;
-            if (id) {
-                // Update
-                const res = await db.from('papers').update(formData).eq('id', id);
-                error = res.error;
-            } else {
-                // Insert
-                const res = await db.from('papers').insert([formData]);
-                error = res.error;
-            }
-
-            saveBtn.innerText = originalBtnText;
-            saveBtn.disabled = false;
-
-            if (error) {
-                alert('Gagal menyimpan: ' + error.message);
-            } else {
-                closeModal();
-                showToast('Data berhasil disimpan!');
-                fetchPapers();
-            }
+            // Trigger Async Start Session
+            startSession();
         });
 
-        async function deletePaper(id) {
-            if(!confirm('Yakin ingin menghapus paper ini?')) return;
+        // --- LOGIC ---
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
 
-            const { error } = await db.from('papers').delete().eq('id', id);
-            
-            if (error) {
-                alert('Gagal menghapus');
-            } else {
-                showToast('Paper dihapus', 'error');
-                fetchPapers();
+        function generateSequence(count) {
+            let seq = [];
+            const half = Math.floor(count / 2);
+            for(let i=0; i<half; i++) seq.push("Extension");
+            for(let i=0; i<half; i++) seq.push("Flexion");
+            if(count % 2 !== 0) seq.push(Math.random() > 0.5 ? "Extension" : "Flexion");
+            return shuffle(seq);
+        }
+
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            if(screens[screenName]) screens[screenName].classList.remove('hidden');
+        }
+
+        function showPhaseElement(phaseName) {
+            Object.values(phases).forEach(p => p.classList.add('hidden'));
+            if(phaseName && phases[phaseName]) phases[phaseName].classList.remove('hidden');
+        }
+
+        // --- START SESSION WITH SYNC LOGIC ---
+        async function startSession() {
+            // UI Loading State
+            elements.loadingMsg.classList.remove('hidden');
+            elements.btnStart.disabled = true;
+            elements.btnStart.innerText = "Memuat...";
+
+            try {
+                // 1. Cek apakah user ini sudah pernah melakukan jenis sesi ini sebelumnya (apapun tangannya)
+                const { data: existingSession, error } = await supabaseClient
+                    .from('experiment_sessions')
+                    .select('trials_data')
+                    .eq('subject_id', config.id)
+                    .eq('session_type', config.sessionName)
+                    .limit(1);
+
+                if (existingSession && existingSession.length > 0) {
+                    console.log("Ditemukan sesi sebelumnya. Menggunakan pola instruksi yang sama.");
+                    const prevTrials = existingSession[0].trials_data;
+                    
+                    if (prevTrials && prevTrials.length >= config.totalTrials) {
+                         trials = prevTrials.slice(0, config.totalTrials).map(t => t.instruction);
+                    } else {
+                        trials = generateSequence(config.totalTrials);
+                    }
+                } else {
+                    console.log("Sesi baru. Membuat pola acak.");
+                    trials = generateSequence(config.totalTrials);
+                }
+
+                currentTrialIndex = 0;
+                logs = [];
+
+                new Image().src = IMG_EXTENSION;
+                new Image().src = IMG_FLEXION;
+
+                elements.totalTrials.innerText = config.totalTrials;
+                switchScreen('experiment');
+                
+                setTimeout(runTrial, 1000);
+
+            } catch (err) {
+                console.error("Error starting session:", err);
+                alert("Gagal memulai sesi. Cek koneksi internet.");
+            } finally {
+                elements.loadingMsg.classList.add('hidden');
+                elements.btnStart.disabled = false;
+                elements.btnStart.innerText = "Mulai Sesi";
             }
         }
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-            toastMsg.textContent = message;
-            
-            if(type === 'error') {
-                toast.querySelector('i').className = 'fa-solid fa-circle-exclamation text-red-400';
-            } else {
-                toast.querySelector('i').className = 'fa-solid fa-circle-check text-green-400';
+        function runTrial() {
+            if (currentTrialIndex >= config.totalTrials) {
+                finishSession();
+                return;
             }
 
-            toast.classList.remove('translate-y-20');
+            const currentType = trials[currentTrialIndex];
+            elements.trialCounter.innerText = currentTrialIndex + 1;
+            elements.progressBar.style.width = `${((currentTrialIndex) / config.totalTrials) * 100}%`;
+            
+            showPhaseElement('fixation');
             setTimeout(() => {
-                toast.classList.add('translate-y-20');
-            }, 3000);
+                elements.instructionImg.src = currentType === 'Extension' ? IMG_EXTENSION : IMG_FLEXION;
+                elements.instructionText.innerText = currentType === 'Extension' ? "WRIST EXTENSION" : "WRIST FLEXION";
+                showPhaseElement('instruction');
+
+                setTimeout(() => {
+                    elements.actionText.innerText = config.mode === 'ME' ? "LAKUKAN GERAKAN" : "BAYANGKAN GERAKAN";
+                    showPhaseElement('action');
+
+                    const actionStartTime = new Date().toISOString();
+
+                    setTimeout(() => {
+                        logs.push({
+                            trial: currentTrialIndex + 1,
+                            instruction: currentType,
+                            start_time: actionStartTime 
+                        });
+
+                        startRestPhase();
+                    }, 4000);
+                }, 2000);
+            }, 2000);
         }
 
-        // --- 8. INIT ---
-        fetchPapers();
+        function startRestPhase() {
+            showPhaseElement('rest');
+            let timeLeft = 5;
+            elements.restTimer.innerText = timeLeft;
+            const countdown = setInterval(() => {
+                timeLeft--;
+                elements.restTimer.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    currentTrialIndex++;
+                    runTrial(); 
+                }
+            }, 1000);
+        }
 
+        function finishSession() {
+            elements.progressBar.style.width = `100%`;
+            switchScreen('result');
+            saveDataToSupabase(); 
+        }
+
+        // --- SAVE TO DB ---
+        async function saveDataToSupabase() {
+            elements.uploadStatus.innerText = "Menyimpan data sesi ke Cloud...";
+            elements.uploadStatus.className = "mb-6 p-3 bg-blue-900 rounded text-sm text-blue-200 animate-pulse";
+
+            try {
+                const sessionPayload = {
+                    subject_id: config.id,
+                    hand: config.hand,
+                    session_type: config.sessionName,
+                    mode: config.mode,
+                    trials_data: logs 
+                };
+
+                const { data, error } = await supabaseClient
+                    .from('experiment_sessions') 
+                    .insert(sessionPayload);
+
+                if (error) throw error;
+
+                elements.uploadStatus.innerText = "✅ Sesi berhasil disimpan!";
+                elements.uploadStatus.className = "mb-6 p-3 bg-green-900 rounded text-sm text-green-200";
+            } catch (err) {
+                console.error("Supabase Error:", err);
+                elements.uploadStatus.innerText = "❌ Gagal menyimpan. Pastikan tabel 'experiment_sessions' sudah dibuat.";
+                elements.uploadStatus.className = "mb-6 p-3 bg-red-900 rounded text-sm text-red-200";
+            }
+        }
+
+        // --- HISTORY LOGIC ---
+        function openDataScreen() {
+            switchScreen('data');
+            fetchDataHistory();
+        }
+
+        async function fetchDataHistory() {
+            elements.dataTableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 animate-pulse">Mengambil data sesi...</td></tr>`;
+
+            const { data, error } = await supabaseClient
+                .from('experiment_sessions') 
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(200);
+
+            if (error) {
+                elements.dataTableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-400">Error: ${error.message}</td></tr>`;
+                return;
+            }
+            if (!data || data.length === 0) {
+                elements.dataTableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">Belum ada sesi terekam.</td></tr>`;
+                return;
+            }
+
+            fetchedSessions = data;
+
+            // GROUP BY SUBJECT ID
+            const groupedData = {};
+            data.forEach((row, index) => {
+                row.original_index = index; 
+                if (!groupedData[row.subject_id]) groupedData[row.subject_id] = [];
+                groupedData[row.subject_id].push(row);
+            });
+
+            elements.dataTableBody.innerHTML = '';
+            
+            Object.keys(groupedData).sort().forEach(subjectId => {
+                const sessions = groupedData[subjectId];
+
+                // Header Peserta dengan Tombol Hapus Peserta
+                const headerTr = document.createElement('tr');
+                headerTr.className = "bg-gray-700 text-blue-300 font-bold border-t-4 border-gray-900";
+                headerTr.innerHTML = `
+                    <td colspan="5" class="p-3 pl-4">
+                        <span class="text-gray-400 font-normal text-xs uppercase tracking-wide mr-2">Peserta:</span>
+                        ${subjectId}
+                        <span class="ml-2 text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">${sessions.length} Sesi</span>
+                    </td>
+                    <td class="p-3 text-right">
+                        <button onclick="deleteParticipant('${subjectId}')" class="bg-red-900 hover:bg-red-700 text-red-200 text-xs px-3 py-1 rounded border border-red-800 transition">
+                            Hapus Semua
+                        </button>
+                    </td>
+                `;
+                elements.dataTableBody.appendChild(headerTr);
+
+                // Baris Sesi dengan Tombol Hapus Sesi
+                sessions.forEach(row => {
+                    const date = new Date(row.created_at).toLocaleString('id-ID', {
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                    });
+                    const trialCount = row.trials_data ? row.trials_data.length : 0;
+                    
+                    const isPractice = row.session_type.includes('Latihan');
+                    const opacityClass = isPractice ? "opacity-50" : "";
+
+                    const tr = document.createElement('tr');
+                    tr.className = `hover:bg-gray-750 transition-colors border-b border-gray-700 bg-gray-800 bg-opacity-40 ${opacityClass}`;
+                    tr.innerHTML = `
+                        <td class="p-4 pl-8 text-gray-400 whitespace-nowrap text-sm border-l-4 border-transparent hover:border-blue-500">${date}</td>
+                        <td class="p-4 text-sm">${row.session_type}</td>
+                        <td class="p-4">
+                            <span class="px-2 py-1 rounded text-xs font-bold ${row.mode === 'ME' ? 'bg-blue-900 text-blue-200' : 'bg-purple-900 text-purple-200'}">${row.mode}</span>
+                        </td>
+                        <td class="p-4 text-sm font-medium ${row.hand === 'Kanan' ? 'text-green-300' : 'text-yellow-300'}">${row.hand}</td>
+                        <td class="p-4 text-center text-sm"><span class="bg-gray-700 px-2 py-1 rounded">${trialCount}</span></td>
+                        <td class="p-4 text-right">
+                            <div class="flex justify-end gap-2">
+                                <button onclick="viewSessionDetail(${row.original_index})" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-2 py-1 rounded font-bold transition shadow">Lihat</button>
+                                <button onclick="downloadHistoryCSV(${row.original_index})" class="bg-gray-600 hover:bg-gray-500 text-white text-xs px-2 py-1 rounded font-bold transition shadow">CSV</button>
+                                <button onclick="deleteSession(${row.original_index})" class="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded font-bold transition shadow" title="Hapus Sesi Ini">Hapus</button>
+                            </div>
+                        </td>
+                    `;
+                    elements.dataTableBody.appendChild(tr);
+                });
+            });
+        }
+
+        // --- DELETE FUNCTIONS (NEW) ---
+
+        async function deleteSession(index) {
+            const row = fetchedSessions[index];
+            if (!row) return;
+
+            if (!confirm(`Apakah Anda yakin ingin menghapus sesi "${row.session_type}" pada tanggal ${new Date(row.created_at).toLocaleDateString()}?\nData tidak dapat dikembalikan.`)) {
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('experiment_sessions')
+                    .delete()
+                    .eq('id', row.id);
+
+                if (error) throw error;
+                alert("Sesi berhasil dihapus.");
+                fetchDataHistory(); // Refresh table
+            } catch (err) {
+                console.error("Error deleting session:", err);
+                alert("Gagal menghapus sesi. Pastikan kebijakan keamanan database mengizinkan delete.");
+            }
+        }
+
+        async function deleteParticipant(subjectId) {
+            if (!confirm(`PERINGATAN: Anda akan menghapus SEMUA data untuk peserta "${subjectId}".\nIni akan menghapus semua sesi (kanan/kiri, latihan/utama) untuk ID ini.\n\nApakah Anda yakin?`)) {
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('experiment_sessions')
+                    .delete()
+                    .eq('subject_id', subjectId);
+
+                if (error) throw error;
+                alert(`Semua data untuk ${subjectId} berhasil dihapus.`);
+                fetchDataHistory(); // Refresh table
+            } catch (err) {
+                console.error("Error deleting participant:", err);
+                alert("Gagal menghapus data peserta. Pastikan kebijakan keamanan database mengizinkan delete.");
+            }
+        }
+
+        // --- FITUR EXPORT HORIZONTAL (FILTERED & BLOB FIX) ---
+        async function downloadAllHistoryCSV() {
+            const btn = document.querySelector('button[onclick="downloadAllHistoryCSV()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span>⏳ Memproses...</span>`;
+            btn.disabled = true;
+
+            try {
+                // Fetch data
+                const { data, error } = await supabaseClient
+                    .from('experiment_sessions') 
+                    .select('*')
+                    .order('subject_id', { ascending: true })
+                    .order('created_at', { ascending: true }) 
+                    .limit(1000);
+
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    alert("Database kosong.");
+                    return;
+                }
+
+                // FILTER: HANYA SESI UTAMA
+                const filteredData = data.filter(s => !s.session_type.includes('Latihan'));
+
+                if (filteredData.length === 0) {
+                    alert("Tidak ada data sesi UTAMA. (Hanya ada sesi Latihan).");
+                    return;
+                }
+
+                // Hitung max trials
+                let maxTrials = 0;
+                filteredData.forEach(s => {
+                    if (s.trials_data && s.trials_data.length > maxTrials) {
+                        maxTrials = s.trials_data.length;
+                    }
+                });
+
+                // Buat Header
+                let csvContent = "ParticipantID,Hand,SessionType,Mode,SessionDate,";
+                for (let i = 1; i <= maxTrials; i++) {
+                    csvContent += `Trial_${i}_Instruksi,Trial_${i}_Waktu_Action,`;
+                }
+                csvContent += "\n";
+
+                // Isi Data
+                filteredData.forEach(session => {
+                    const sessionDate = new Date(session.created_at).toISOString();
+                    let rowStr = `${session.subject_id},${session.hand},${session.session_type},${session.mode},${sessionDate},`;
+
+                    const trials = session.trials_data || [];
+                    for (let i = 0; i < maxTrials; i++) {
+                        if (trials[i]) {
+                            rowStr += `${trials[i].instruction},${trials[i].start_time},`;
+                        } else {
+                            rowStr += ",,";
+                        }
+                    }
+                    csvContent += rowStr + "\n";
+                });
+
+                // --- FIX: GUNAKAN BLOB UNTUK DOWNLOAD ---
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement("a");
+                link.href = url;
+                const timestamp = new Date().toISOString().slice(0,19).replace(/:/g,"-");
+                link.setAttribute("download", `REKAP_UTAMA_MOTORIK_${timestamp}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Cleanup URL object
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+
+            } catch (err) {
+                console.error(err);
+                alert("Gagal mengunduh: " + err.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // --- MODAL & INDIVIDUAL CSV ---
+        function viewSessionDetail(index) {
+            const row = fetchedSessions[index];
+            if(!row) return;
+
+            const date = new Date(row.created_at).toLocaleString('id-ID', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            elements.modalInfo.innerHTML = `
+                <div><p class="text-gray-400 text-xs">Peserta</p><p class="text-white font-bold text-lg">${row.subject_id}</p></div>
+                <div><p class="text-gray-400 text-xs">Waktu</p><p class="text-white font-bold">${date}</p></div>
+                <div><p class="text-gray-400 text-xs">Jenis Sesi</p><p class="text-white font-bold">${row.session_type} (${row.mode})</p></div>
+                <div><p class="text-gray-400 text-xs">Tangan</p><p class="text-white font-bold ${row.hand === 'Kanan' ? 'text-green-400' : 'text-yellow-400'}">${row.hand}</p></div>
+            `;
+
+            elements.modalList.innerHTML = '';
+            const trials = row.trials_data || [];
+
+            if (trials.length === 0) {
+                elements.modalList.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-500">Tidak ada detail trial.</td></tr>`;
+            } else {
+                trials.forEach(t => {
+                    let timeDisplay = t.start_time;
+                    try {
+                        const d = new Date(t.start_time);
+                        timeDisplay = d.toLocaleTimeString('id-ID', { hour12: false }) + `.${d.getMilliseconds()}`;
+                    } catch(e) {}
+                    const colorClass = t.instruction === 'Extension' ? 'text-green-400' : 'text-yellow-400';
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-700 transition-colors";
+                    tr.innerHTML = `
+                        <td class="p-3 text-center border-b border-gray-700 text-gray-400">${t.trial}</td>
+                        <td class="p-3 border-b border-gray-700 font-bold ${colorClass}">${t.instruction}</td>
+                        <td class="p-3 text-right border-b border-gray-700 font-mono text-gray-400 text-xs">${timeDisplay}</td>
+                    `;
+                    elements.modalList.appendChild(tr);
+                });
+            }
+            elements.modal.classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            elements.modal.classList.add('hidden');
+        }
+
+        elements.modal.addEventListener('click', function(e) {
+            if (e.target === elements.modal) closeDetailModal();
+        });
+
+        function downloadHistoryCSV(index) {
+            const row = fetchedSessions[index];
+            if (!row) return alert("Data tidak ditemukan.");
+            const trials = row.trials_data;
+            if(!trials || trials.length === 0) return alert("Data kosong.");
+
+            let csvContent = "ParticipantID,Hand,SessionType,Mode,TrialNumber,Instruction,Timestamp_Action\n";
+            trials.forEach(t => {
+                csvContent += `${row.subject_id},${row.hand},${row.session_type},${row.mode},${t.trial},${t.instruction},${t.start_time}\n`;
+            });
+            
+            // FIX BLOB DOWNLOAD
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `Data_${row.subject_id}_${row.session_type}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+
+        function downloadCSV() {
+            if (logs.length === 0) return alert("Tidak ada data.");
+            let csvContent = "ParticipantID,Hand,SessionType,Mode,TrialNumber,Instruction,Timestamp_Action\n";
+            logs.forEach(l => {
+                csvContent += `${config.id},${config.hand},${config.sessionName},${config.mode},${l.trial},${l.instruction},${l.start_time}\n`;
+            });
+
+            // FIX BLOB DOWNLOAD
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const timestamp = new Date().toISOString().slice(0,19).replace(/:/g,"-");
+            link.setAttribute("download", `Data_${config.id}_${config.sessionName}_${timestamp}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
     </script>
 </body>
 </html>
