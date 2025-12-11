@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Peternakan Paper</title>
+    <title>Manajemen Peternakan Karya Ilmiah</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS -->
@@ -39,28 +39,40 @@
     <!-- Navbar -->
     <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16 gap-4">
-                <!-- Logo -->
-                <div class="flex items-center gap-3 flex-shrink-0">
-                    <i class="fa-solid fa-cow text-blue-600 text-2xl"></i>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight hidden sm:block">Peternakan Paper</h1>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight sm:hidden">Paper</h1>
+            <div class="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-3 md:py-0 gap-4">
+                <!-- Logo & Title -->
+                <div class="flex items-center gap-3 flex-shrink-0 w-full md:w-auto">
+                    <i class="fa-solid fa-layer-group text-blue-600 text-2xl"></i>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Manajemen Karya</h1>
+                </div>
+
+                <!-- Submenu Tabs (NEW) -->
+                <div class="flex bg-slate-100 p-1 rounded-lg overflow-x-auto w-full md:w-auto">
+                    <button onclick="switchType('Paper')" id="tab-Paper" class="px-4 py-1.5 text-sm font-medium rounded-md transition-all w-full md:w-auto whitespace-nowrap bg-white text-blue-600 shadow-sm">
+                        <i class="fa-solid fa-file-lines mr-2"></i>Paper
+                    </button>
+                    <button onclick="switchType('Buku')" id="tab-Buku" class="px-4 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all w-full md:w-auto whitespace-nowrap">
+                        <i class="fa-solid fa-book mr-2"></i>Buku
+                    </button>
+                    <button onclick="switchType('Proposal')" id="tab-Proposal" class="px-4 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all w-full md:w-auto whitespace-nowrap">
+                        <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Proposal
+                    </button>
                 </div>
 
                 <!-- Search Bar -->
-                <div class="flex-1 max-w-lg">
+                <div class="flex-1 max-w-sm w-full">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fa-solid fa-search text-slate-400"></i>
                         </div>
-                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-500 focus:outline-none focus:bg-white focus:placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Cari judul paper atau penulis...">
+                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-500 focus:outline-none focus:bg-white focus:placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Cari judul atau penulis...">
                     </div>
                 </div>
 
                 <!-- Action Button -->
-                <div class="flex items-center flex-shrink-0">
-                    <button onclick="openModal(); event.stopPropagation()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-blue-500/30 flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tambah Paper</span>
+                <div class="flex items-center flex-shrink-0 w-full md:w-auto justify-end">
+                    <button onclick="openModal(); event.stopPropagation()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-blue-500/30 flex items-center gap-2 whitespace-nowrap w-full md:w-auto justify-center">
+                        <i class="fa-solid fa-plus"></i> <span id="addBtnText">Tambah Paper</span>
                     </button>
                 </div>
             </div>
@@ -86,7 +98,7 @@
                     </select>
                 </div>
 
-                <!-- Filter Kategori (NEW) -->
+                <!-- Filter Kategori -->
                 <div class="relative w-full sm:w-48">
                     <select id="categoryFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
                         <option value="all">Semua Kategori</option>
@@ -105,14 +117,14 @@
                 </div>
             </div>
             <div class="text-sm text-slate-500 whitespace-nowrap">
-                Total: <span id="totalCount" class="font-semibold text-slate-700">0</span> paper
+                Menampilkan <span id="currentTypeLabel" class="font-bold">Paper</span>: <span id="totalCount" class="font-semibold text-slate-700">0</span> item
             </div>
         </div>
         
         <!-- Loading State -->
         <div id="loading" class="text-center py-20 hidden">
             <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
-            <p class="mt-4 text-slate-500">Memuat data ternak...</p>
+            <p class="mt-4 text-slate-500">Memuat data...</p>
         </div>
 
         <!-- Table Container -->
@@ -123,9 +135,9 @@
                         <tr>
                             <th scope="col" class="px-4 py-3 min-w-[100px]">Deadline</th>
                             <th scope="col" class="px-4 py-3 min-w-[150px]">Penulis</th>
-                            <th scope="col" class="px-4 py-3 min-w-[250px]">Judul Paper</th>
+                            <th scope="col" class="px-4 py-3 min-w-[250px]" id="headerJudul">Judul Paper</th>
                             <th scope="col" class="px-4 py-3 min-w-[150px]">Status</th>
-                            <th scope="col" class="px-4 py-3 min-w-[150px]">Target Jurnal</th>
+                            <th scope="col" class="px-4 py-3 min-w-[150px]" id="headerTarget">Target Jurnal</th>
                             <th scope="col" class="px-4 py-3 min-w-[100px]">Links</th>
                             <th scope="col" class="px-4 py-3 min-w-[100px]">Biaya</th>
                             <th scope="col" class="px-4 py-3 min-w-[200px]">Catatan</th>
@@ -141,10 +153,10 @@
             <!-- Empty State -->
             <div id="emptyState" class="hidden flex flex-col items-center justify-center py-16 text-center">
                 <div class="bg-slate-100 p-4 rounded-full mb-4">
-                    <i class="fa-regular fa-folder-open text-3xl text-slate-400"></i>
+                    <i class="fa-solid fa-folder-open text-3xl text-slate-400"></i>
                 </div>
-                <h3 class="text-lg font-medium text-slate-900">Belum ada paper</h3>
-                <p class="text-slate-500 mt-1 max-w-sm">Mulai tambahkan progress paper penelitian Anda untuk melacak statusnya.</p>
+                <h3 class="text-lg font-medium text-slate-900" id="emptyStateTitle">Belum ada data</h3>
+                <p class="text-slate-500 mt-1 max-w-sm">Mulai tambahkan data baru untuk kategori ini.</p>
             </div>
 
             <!-- Not Found State (Search/Filter) -->
@@ -152,7 +164,7 @@
                 <div class="text-slate-300 mb-2">
                     <i class="fa-solid fa-filter text-3xl"></i>
                 </div>
-                <p class="text-slate-500">Tidak ada paper yang cocok dengan filter atau pencarian.</p>
+                <p class="text-slate-500">Tidak ada data yang cocok dengan filter atau pencarian.</p>
             </div>
         </div>
     </main>
@@ -167,7 +179,7 @@
                     <!-- Modal Header -->
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-lg font-semibold leading-6 text-slate-900" id="modalTitle">Tambah Paper Baru</h3>
+                            <h3 class="text-lg font-semibold leading-6 text-slate-900" id="modalTitle">Tambah Data Baru</h3>
                             <button onclick="closeModal()" class="text-slate-400 hover:text-slate-500">
                                 <i class="fa-solid fa-xmark text-xl"></i>
                             </button>
@@ -177,12 +189,14 @@
                     <!-- Modal Body -->
                     <form id="paperForm" class="p-6">
                         <input type="hidden" id="paperId">
+                        <!-- Hidden field for Jenis/Type -->
+                        <input type="hidden" id="jenisInput">
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Kolom Kiri -->
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Judul Paper *</label>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1" id="labelJudul">Judul *</label>
                                     <input type="text" id="judul" required class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                 </div>
                                 
@@ -205,12 +219,12 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Target Jurnal / Conference</label>
-                                    <input type="text" id="target_jurnal" placeholder="e.g. IEEE Access, Q1" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                    <label class="block text-xs font-medium text-slate-700 mb-1" id="labelTarget">Target Jurnal / Conference</label>
+                                    <input type="text" id="target_jurnal" placeholder="e.g. IEEE Access, Q1, Penerbit X" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Penulis</label>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Penulis / Tim</label>
                                     <input type="text" id="penulis" placeholder="e.g. MIB, MBG, MMR" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                 </div>
                             </div>
@@ -220,10 +234,10 @@
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Tautan Penting</label>
                                     <div class="space-y-2">
-                                        <input type="url" id="link_overleaf" placeholder="Link Overleaf" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_referensi" placeholder="Link Referensi" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_ppt" placeholder="Link PPT/Canva" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_submission" placeholder="Link Submission" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                        <input type="url" id="link_overleaf" placeholder="Link Dokumen/Overleaf" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                        <input type="url" id="link_referensi" placeholder="Link Referensi/Sumber" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                        <input type="url" id="link_ppt" placeholder="Link PPT/Canva/Design" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                        <input type="url" id="link_submission" placeholder="Link Submission/Drive" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
                                     </div>
                                 </div>
 
@@ -233,8 +247,8 @@
                                         <input type="text" id="biaya" placeholder="$0.00" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Kategori</label>
-                                        <input type="text" id="kategori" placeholder="e.g. Q2" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Kategori / Topik</label>
+                                        <input type="text" id="kategori" placeholder="e.g. Quantum" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                 </div>
 
@@ -245,16 +259,10 @@
                             </div>
                         </div>
 
-                        <!-- Technical Fields (Hidden/Collapsed UI simplified for MVP) -->
-                        <div class="mt-4 grid grid-cols-2 gap-4">
-                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Mapping</label>
-                                <input type="text" id="mapping" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                             </div>
-                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Consensus</label>
-                                <input type="text" id="consensus" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                             </div>
+                        <!-- Technical Fields Hidden -->
+                        <div class="mt-4 hidden">
+                             <input type="text" id="mapping">
+                             <input type="text" id="consensus">
                         </div>
 
                         <div class="mt-6 flex justify-end gap-3">
@@ -285,8 +293,9 @@
 
         // --- 2. STATE ---
         let papers = [];
+        let currentType = 'Paper'; // 'Paper', 'Buku', or 'Proposal'
         let currentFilterStatus = 'all';
-        let currentFilterCategory = 'all'; // New State
+        let currentFilterCategory = 'all';
         let currentSortOption = 'deadline_asc';
         let currentSearchTerm = '';
 
@@ -297,18 +306,56 @@
         const notFoundStateEl = document.getElementById('notFoundState');
         const searchInput = document.getElementById('searchInput');
         const statusFilter = document.getElementById('statusFilter');
-        const categoryFilter = document.getElementById('categoryFilter'); // New Element
+        const categoryFilter = document.getElementById('categoryFilter');
         const sortOption = document.getElementById('sortOption');
         const totalCountEl = document.getElementById('totalCount');
+        const currentTypeLabel = document.getElementById('currentTypeLabel');
+        const addBtnText = document.getElementById('addBtnText');
+        const headerJudul = document.getElementById('headerJudul');
+        const headerTarget = document.getElementById('headerTarget');
         const modal = document.getElementById('paperModal');
         const form = document.getElementById('paperForm');
 
-        // --- 4. HELPER FUNCTIONS ---
+        // --- 4. SUBMENU LOGIC (NEW) ---
+        
+        function switchType(type) {
+            currentType = type;
+            
+            // Update UI Tabs Styling
+            ['Paper', 'Buku', 'Proposal'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === type) {
+                    btn.className = "px-4 py-1.5 text-sm font-medium rounded-md transition-all w-full md:w-auto whitespace-nowrap bg-white text-blue-600 shadow-sm ring-1 ring-slate-200";
+                } else {
+                    btn.className = "px-4 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all w-full md:w-auto whitespace-nowrap hover:bg-slate-50";
+                }
+            });
+
+            // Update Labels
+            currentTypeLabel.textContent = type;
+            addBtnText.textContent = `Tambah ${type}`;
+            
+            // Update Table Headers based on Type
+            if (type === 'Buku') {
+                headerJudul.textContent = 'Judul Buku';
+                headerTarget.textContent = 'Penerbit';
+            } else if (type === 'Proposal') {
+                headerJudul.textContent = 'Judul Proposal';
+                headerTarget.textContent = 'Skema / Hibah';
+            } else {
+                headerJudul.textContent = 'Judul Paper';
+                headerTarget.textContent = 'Target Jurnal';
+            }
+
+            // Fetch Data for new type
+            fetchPapers();
+        }
+
+        // --- 5. HELPER FUNCTIONS ---
         
         function getStatusBadge(status) {
             const s = (status || '').toLowerCase();
             let classes = '';
-            let label = status || '-';
             let icon = '';
 
             if (s.includes('belum')) {
@@ -333,7 +380,7 @@
                 classes = 'bg-slate-50 text-slate-500';
             }
 
-            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${classes}">${icon}${label}</span>`;
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${classes}">${icon}${status || '-'}</span>`;
         }
 
         function formatDate(dateString) {
@@ -347,38 +394,29 @@
             return `<a href="${url}" target="_blank" title="${tooltip}" class="${colorClass} hover:opacity-75 transition z-10 relative" onclick="event.stopPropagation()"><i class="${iconClass}"></i></a>`;
         }
 
-        // New function to dynamically populate categories based on loaded data
         function populateCategoryFilter() {
-            // Extract unique categories, remove null/empty
             const categories = [...new Set(papers.map(p => p.kategori).filter(k => k && k.trim() !== ''))];
-            categories.sort(); // Sort alphabetically
-
-            // Keep "Semua Kategori" and reset options
+            categories.sort(); 
             categoryFilter.innerHTML = '<option value="all">Semua Kategori</option>';
-
             categories.forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat;
                 option.textContent = cat;
                 categoryFilter.appendChild(option);
             });
-            
-            // Restore selection if previously selected category still exists
             categoryFilter.value = currentFilterCategory;
-            
-            // If current selection is no longer valid (e.g. data deleted), reset to 'all'
             if (categoryFilter.value !== currentFilterCategory) {
                 currentFilterCategory = 'all';
                 categoryFilter.value = 'all';
             }
         }
 
-        // --- 5. FILTER & SORT LOGIC ---
+        // --- 6. FILTER & SORT LOGIC ---
         
         function applyFiltersAndSort() {
             let result = [...papers];
 
-            // 1. Filter by Search
+            // Filter by Search
             if (currentSearchTerm) {
                 result = result.filter(paper => {
                     const judul = (paper.judul || '').toLowerCase();
@@ -387,7 +425,7 @@
                 });
             }
 
-            // 2. Filter by Status
+            // Filter by Status
             if (currentFilterStatus !== 'all') {
                 result = result.filter(paper => {
                     const s = (paper.status || '').toLowerCase();
@@ -396,32 +434,23 @@
                 });
             }
 
-            // 3. Filter by Category (New)
+            // Filter by Category
             if (currentFilterCategory !== 'all') {
-                result = result.filter(paper => {
-                    return paper.kategori === currentFilterCategory;
-                });
+                result = result.filter(paper => paper.kategori === currentFilterCategory);
             }
 
-            // 4. Sort
+            // Sort
             result.sort((a, b) => {
                 if (currentSortOption === 'deadline_asc') {
-                    // Handle null deadlines: push to end
-                    if (!a.deadline) return 1;
-                    if (!b.deadline) return -1;
+                    if (!a.deadline) return 1; if (!b.deadline) return -1;
                     return new Date(a.deadline) - new Date(b.deadline);
                 } else if (currentSortOption === 'deadline_desc') {
-                    if (!a.deadline) return 1;
-                    if (!b.deadline) return -1;
+                    if (!a.deadline) return 1; if (!b.deadline) return -1;
                     return new Date(b.deadline) - new Date(a.deadline);
                 } else if (currentSortOption === 'title_asc') {
-                    const titleA = (a.judul || '').toLowerCase();
-                    const titleB = (b.judul || '').toLowerCase();
-                    return titleA.localeCompare(titleB);
+                    return (a.judul || '').localeCompare(b.judul || '');
                 } else if (currentSortOption === 'title_desc') {
-                    const titleA = (a.judul || '').toLowerCase();
-                    const titleB = (b.judul || '').toLowerCase();
-                    return titleB.localeCompare(titleA);
+                    return (b.judul || '').localeCompare(a.judul || '');
                 }
                 return 0;
             });
@@ -429,7 +458,6 @@
             renderTable(result);
         }
 
-        // Event Listeners
         searchInput.addEventListener('input', (e) => {
             currentSearchTerm = e.target.value.toLowerCase();
             applyFiltersAndSort();
@@ -440,7 +468,6 @@
             applyFiltersAndSort();
         });
         
-        // Listener for Category Filter
         categoryFilter.addEventListener('change', (e) => {
             currentFilterCategory = e.target.value;
             applyFiltersAndSort();
@@ -451,7 +478,7 @@
             applyFiltersAndSort();
         });
 
-        // --- 6. CORE FUNCTIONS ---
+        // --- 7. CORE FUNCTIONS ---
 
         async function fetchPapers() {
             loadingEl.classList.remove('hidden');
@@ -459,48 +486,38 @@
             emptyStateEl.classList.add('hidden');
             notFoundStateEl.classList.add('hidden');
 
+            // FETCH DATA BASED ON CURRENT TYPE
             const { data, error } = await db
                 .from('papers')
                 .select('*')
-                // Default order fetch, but client side sort will override
+                .eq('jenis', currentType) // Filter by Type directly from DB
                 .order('deadline', { ascending: true });
 
             loadingEl.classList.add('hidden');
 
             if (error) {
                 console.error('Error fetching:', error);
-                showToast('Gagal mengambil data. Pastikan tabel database sudah dibuat.', 'error');
+                showToast('Gagal mengambil data.', 'error');
                 return;
             }
 
             papers = data || [];
-            
-            // Populate category dropdown based on fetched data
             populateCategoryFilter();
-
-            // Reset filters on full fetch
-            searchInput.value = '';
-            currentSearchTerm = '';
-            // Note: We keep sort and status/category filter preference from UI
-            
             applyFiltersAndSort();
         }
 
         function renderTable(dataToRender) {
             tableBody.innerHTML = '';
             totalCountEl.textContent = dataToRender.length;
-            
-            // Hide states
             emptyStateEl.classList.add('hidden');
             notFoundStateEl.classList.add('hidden');
 
-            // Scenario 1: No data in DB
             if (papers.length === 0) {
+                document.getElementById('emptyStateTitle').textContent = `Belum ada data ${currentType}`;
                 emptyStateEl.classList.remove('hidden');
                 return;
             }
 
-            // Scenario 2: Data in DB but Filter returns empty
             if (dataToRender.length === 0) {
                 notFoundStateEl.classList.remove('hidden');
                 return;
@@ -510,13 +527,12 @@
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b border-slate-100 hover:bg-blue-50 transition-colors cursor-pointer group relative';
                 row.onclick = () => editPaper(paper.id);
-                row.title = "Klik baris untuk mengedit paper";
                 
                 const linksHtml = `
                     <div class="flex gap-3 text-lg" onclick="event.stopPropagation()">
-                        ${generateLinkIcon(paper.link_overleaf, 'fa-solid fa-file-code', 'text-green-600', 'Overleaf')}
+                        ${generateLinkIcon(paper.link_overleaf, 'fa-solid fa-file-code', 'text-green-600', 'Dokumen')}
                         ${generateLinkIcon(paper.link_referensi, 'fa-solid fa-book', 'text-blue-500', 'Referensi')}
-                        ${generateLinkIcon(paper.link_ppt, 'fa-solid fa-file-powerpoint', 'text-orange-500', 'PPT/Canva')}
+                        ${generateLinkIcon(paper.link_ppt, 'fa-solid fa-file-powerpoint', 'text-orange-500', 'Design/PPT')}
                         ${generateLinkIcon(paper.link_submission, 'fa-solid fa-upload', 'text-purple-500', 'Submission')}
                     </div>
                 `;
@@ -556,17 +572,31 @@
             });
         }
 
-        // --- 7. MODAL & FORM LOGIC ---
+        // --- 8. MODAL & FORM LOGIC ---
 
         function openModal(isEdit = false) {
             modal.classList.remove('hidden');
+            
+            // Adjust label modal based on current type
+            if (currentType === 'Buku') {
+                document.getElementById('labelJudul').textContent = 'Judul Buku *';
+                document.getElementById('labelTarget').textContent = 'Penerbit';
+            } else if (currentType === 'Proposal') {
+                document.getElementById('labelJudul').textContent = 'Judul Proposal *';
+                document.getElementById('labelTarget').textContent = 'Skema / Hibah';
+            } else {
+                document.getElementById('labelJudul').textContent = 'Judul Paper *';
+                document.getElementById('labelTarget').textContent = 'Target Jurnal / Conference';
+            }
+
             if (!isEdit) {
-                document.getElementById('modalTitle').textContent = 'Tambah Paper Baru';
+                document.getElementById('modalTitle').textContent = `Tambah ${currentType} Baru`;
                 form.reset();
                 document.getElementById('paperId').value = '';
                 document.getElementById('status').value = 'Belum Diapapakan';
+                document.getElementById('jenisInput').value = currentType; // Set hidden input
             } else {
-                document.getElementById('modalTitle').textContent = 'Edit Paper';
+                document.getElementById('modalTitle').textContent = `Edit ${currentType}`;
             }
         }
 
@@ -578,7 +608,9 @@
             const paper = papers.find(p => p.id === id);
             if (!paper) return;
 
+            // Ensure we are in the correct tab, though user clicked it so we should be
             document.getElementById('paperId').value = paper.id;
+            document.getElementById('jenisInput').value = paper.jenis || 'Paper';
             document.getElementById('judul').value = paper.judul || '';
             document.getElementById('deadline').value = paper.deadline || '';
             document.getElementById('status').value = paper.status || 'Belum Diapapakan';
@@ -607,6 +639,7 @@
             const id = document.getElementById('paperId').value;
             
             const formData = {
+                jenis: document.getElementById('jenisInput').value || currentType, // Important
                 judul: document.getElementById('judul').value,
                 deadline: document.getElementById('deadline').value || null,
                 status: document.getElementById('status').value,
@@ -625,11 +658,9 @@
 
             let error;
             if (id) {
-                // Update
                 const res = await db.from('papers').update(formData).eq('id', id);
                 error = res.error;
             } else {
-                // Insert
                 const res = await db.from('papers').insert([formData]);
                 error = res.error;
             }
@@ -647,14 +678,12 @@
         });
 
         async function deletePaper(id) {
-            if(!confirm('Yakin ingin menghapus paper ini?')) return;
-
+            if(!confirm('Yakin ingin menghapus data ini?')) return;
             const { error } = await db.from('papers').delete().eq('id', id);
-            
             if (error) {
                 alert('Gagal menghapus');
             } else {
-                showToast('Paper dihapus', 'error');
+                showToast('Data dihapus', 'error');
                 fetchPapers();
             }
         }
@@ -676,8 +705,9 @@
             }, 3000);
         }
 
-        // --- 8. INIT ---
-        fetchPapers();
+        // --- 9. INIT ---
+        // Initialize default tab styling
+        switchType('Paper');
 
     </script>
 </body>
