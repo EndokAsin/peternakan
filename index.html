@@ -29,7 +29,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-3 md:py-0 gap-4">
                 <div class="flex items-center gap-3 flex-shrink-0 w-full md:w-auto">
                     <i class="fa-solid fa-layer-group text-blue-600 text-2xl"></i>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Manajemen Peternakan</h1>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Manajemen Karya</h1>
                 </div>
 
                 <!-- Submenu Tabs -->
@@ -134,7 +134,7 @@
                             <th scope="col" class="px-4 py-3 min-w-[250px]" id="headerJudul">Judul Paper</th>
                             <th scope="col" class="px-4 py-3 min-w-[150px]">Status</th>
                             <th scope="col" class="px-4 py-3 min-w-[150px]" id="headerTarget">Target Jurnal</th>
-                            <th scope="col" class="px-4 py-3 min-w-[100px]">File/Links</th>
+                            <th scope="col" class="px-4 py-3 min-w-[150px]">File/Links</th>
                             <th scope="col" class="px-4 py-3 min-w-[100px]">Biaya</th>
                             <th scope="col" class="px-4 py-3 min-w-[200px]">Catatan</th>
                             <th scope="col" class="px-4 py-3 min-w-[100px] text-center">Aksi</th>
@@ -202,7 +202,14 @@
 
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1" id="labelTarget">Target</label>
-                                    <input type="text" id="target_jurnal" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                    <input type="text" id="target_jurnal" list="referenceTypes" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2" autocomplete="off">
+                                    <datalist id="referenceTypes">
+                                        <option value="Buku">
+                                        <option value="Jurnal">
+                                        <option value="Website">
+                                        <option value="Prosiding">
+                                        <option value="Laporan">
+                                    </datalist>
                                 </div>
 
                                 <div>
@@ -231,9 +238,19 @@
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Link Manual (Jika tidak upload)</label>
-                                    <input type="url" id="link_referensi" placeholder="Link Referensi/Drive/Web" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                <div class="space-y-2">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Link Referensi (Utama)</label>
+                                        <input type="url" id="link_referensi" placeholder="Link Referensi/Drive/Web" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                    </div>
+                                    
+                                    <!-- SECTION LINK TAMBAHAN KHUSUS PAPER (Overleaf, PPT, Submission) -->
+                                    <div id="paperLinksSection" class="space-y-2 hidden border-t border-slate-100 pt-2">
+                                        <label class="block text-xs font-bold text-slate-600">Tautan Tambahan (Paper)</label>
+                                        <input type="url" id="link_overleaf" placeholder="Link Overleaf" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                        <input type="url" id="link_ppt" placeholder="Link PPT/Canva/Design" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                        <input type="url" id="link_submission" placeholder="Link Submission" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                    </div>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-4">
@@ -242,8 +259,7 @@
                                         <input type="text" id="biaya" placeholder="$0.00" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Kategori / Topik</label>
-                                        <!-- Placeholder akan berubah dinamis -->
+                                        <label class="block text-xs font-medium text-slate-700 mb-1" id="labelKategori">Kategori / Topik</label>
                                         <input type="text" id="kategori" placeholder="e.g. Quantum" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                 </div>
@@ -254,9 +270,6 @@
                                 </div>
                                 
                                 <div class="hidden">
-                                    <input type="url" id="link_overleaf">
-                                    <input type="url" id="link_ppt">
-                                    <input type="url" id="link_submission">
                                     <input type="text" id="mapping">
                                     <input type="text" id="consensus">
                                 </div>
@@ -319,6 +332,7 @@
         const fileUpload = document.getElementById('fileUpload');
         const filePreviewLink = document.getElementById('filePreviewLink');
         const existingFileUrl = document.getElementById('existingFileUrl');
+        const paperLinksSection = document.getElementById('paperLinksSection');
 
         // --- 4. SUBMENU LOGIC ---
         function switchType(type) {
@@ -426,17 +440,31 @@
                 row.onclick = () => editPaper(paper.id);
 
                 let linkDisplay = '';
-                if (paper.link_referensi) {
-                    const isFile = paper.link_referensi.includes('supabase') && paper.link_referensi.includes('/storage/');
-                    if (isFile) {
-                         linkDisplay = `<a href="${paper.link_referensi}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium"><i class="fa-solid fa-file-arrow-down mr-1"></i> Lihat File</a>`;
-                    } else {
-                         linkDisplay = `<a href="${paper.link_referensi}" target="_blank" onclick="event.stopPropagation()" class="text-blue-500 hover:underline"><i class="fa-solid fa-link mr-1"></i> Link</a>`;
-                    }
-                } else if (paper.link_overleaf) {
-                    linkDisplay = `<a href="${paper.link_overleaf}" target="_blank" onclick="event.stopPropagation()" class="text-green-600 hover:underline"><i class="fa-solid fa-file-code mr-1"></i> Doc</a>`;
+                
+                // Logic Tampilan Link Khusus Paper (Kembali ke multi-icon)
+                if (currentType === 'Paper' || currentType === 'Proposal') {
+                     linkDisplay = `
+                        <div class="flex gap-2 text-lg" onclick="event.stopPropagation()">
+                            ${paper.link_overleaf ? `<a href="${paper.link_overleaf}" target="_blank" class="text-green-600 hover:opacity-75" title="Overleaf"><i class="fa-solid fa-file-code"></i></a>` : '<span class="text-slate-200"><i class="fa-solid fa-file-code"></i></span>'}
+                            ${paper.link_referensi ? `<a href="${paper.link_referensi}" target="_blank" class="text-blue-500 hover:opacity-75" title="Referensi"><i class="fa-solid fa-book"></i></a>` : '<span class="text-slate-200"><i class="fa-solid fa-book"></i></span>'}
+                            ${paper.link_ppt ? `<a href="${paper.link_ppt}" target="_blank" class="text-orange-500 hover:opacity-75" title="PPT"><i class="fa-solid fa-file-powerpoint"></i></a>` : '<span class="text-slate-200"><i class="fa-solid fa-file-powerpoint"></i></span>'}
+                            ${paper.link_submission ? `<a href="${paper.link_submission}" target="_blank" class="text-purple-500 hover:opacity-75" title="Submission"><i class="fa-solid fa-upload"></i></a>` : '<span class="text-slate-200"><i class="fa-solid fa-upload"></i></span>'}
+                        </div>
+                    `;
                 } else {
-                    linkDisplay = '<span class="text-slate-300">-</span>';
+                    // Logic Tampilan untuk Referensi / Buku (Single Link/File)
+                    if (paper.link_referensi) {
+                        const isFile = paper.link_referensi.includes('supabase') && paper.link_referensi.includes('/storage/');
+                        if (isFile) {
+                             linkDisplay = `<a href="${paper.link_referensi}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium"><i class="fa-solid fa-file-arrow-down mr-1"></i> Lihat File</a>`;
+                        } else {
+                             linkDisplay = `<a href="${paper.link_referensi}" target="_blank" onclick="event.stopPropagation()" class="text-blue-500 hover:underline"><i class="fa-solid fa-link mr-1"></i> Link</a>`;
+                        }
+                    } else if (paper.link_overleaf) {
+                        linkDisplay = `<a href="${paper.link_overleaf}" target="_blank" onclick="event.stopPropagation()" class="text-green-600 hover:underline"><i class="fa-solid fa-file-code mr-1"></i> Doc</a>`;
+                    } else {
+                        linkDisplay = '<span class="text-slate-300">-</span>';
+                    }
                 }
 
                 row.innerHTML = `
@@ -448,7 +476,9 @@
                         <div class="text-xs text-blue-600 font-normal mt-0.5 bg-blue-50 inline-block px-1.5 py-0.5 rounded">${paper.kategori || 'Tanpa Kategori'}</div>
                     </td>
                     <td class="px-4 py-4 whitespace-nowrap">${getStatusBadge(paper.status)}</td>
-                    <td class="px-4 py-4 text-slate-600 text-xs">${paper.target_jurnal || '-'}</td>
+                    <td class="px-4 py-4 text-slate-600 text-xs font-medium">
+                        ${paper.target_jurnal ? `<span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${paper.target_jurnal}</span>` : '-'}
+                    </td>
                     <td class="px-4 py-4 whitespace-nowrap relative z-10">${linkDisplay}</td>
                     <td class="px-4 py-4 text-slate-600 text-xs font-mono">${paper.biaya || '-'}</td>
                     <td class="px-4 py-4 text-slate-500 text-xs italic max-w-xs truncate" title="${paper.catatan || ''}">${paper.catatan || '-'}</td>
@@ -468,13 +498,25 @@
             const typeLabels = { 'Buku': 'Judul Buku', 'Proposal': 'Judul Proposal', 'Referensi': 'Judul Referensi', 'Paper': 'Judul Paper' };
             document.getElementById('labelJudul').textContent = (typeLabels[currentType] || 'Judul') + ' *';
             document.getElementById('labelTarget').textContent = currentType === 'Buku' ? 'Penerbit' : (currentType === 'Referensi' ? 'Jenis Sumber (e.g. Jurnal/Web)' : 'Target Jurnal');
+            document.getElementById('labelKategori').textContent = currentType === 'Referensi' ? 'Kategori / Topik (e.g. Quantum)' : 'Kategori';
+
+            // --- Show/Hide Paper Links Section based on Type ---
+            if (currentType === 'Paper' || currentType === 'Proposal') {
+                paperLinksSection.classList.remove('hidden');
+            } else {
+                paperLinksSection.classList.add('hidden');
+            }
 
             // --- UX: Custom Placeholder untuk Kategori Referensi ---
             const kategoriInput = document.getElementById('kategori');
+            const targetInput = document.getElementById('target_jurnal');
+
             if (currentType === 'Referensi') {
                 kategoriInput.placeholder = "e.g. Classical, Quantum Biology, Photonic";
+                targetInput.placeholder = "Pilih atau ketik (Buku/Jurnal)";
             } else {
                 kategoriInput.placeholder = "e.g. Q2, Scopus";
+                targetInput.placeholder = "";
             }
 
             fileUpload.value = '';
@@ -508,6 +550,11 @@
             
             document.getElementById('link_referensi').value = paper.link_referensi || '';
             document.getElementById('existingFileUrl').value = paper.link_referensi || '';
+            
+            // Populate Extra Links for Paper
+            document.getElementById('link_overleaf').value = paper.link_overleaf || '';
+            document.getElementById('link_ppt').value = paper.link_ppt || '';
+            document.getElementById('link_submission').value = paper.link_submission || '';
 
             if (paper.link_referensi && paper.link_referensi.includes('/storage/')) {
                 filePreviewLink.classList.remove('hidden');
@@ -561,9 +608,12 @@
                     penulis: document.getElementById('penulis').value,
                     link_referensi: finalFileUrl, 
                     biaya: document.getElementById('biaya').value,
-                    kategori: document.getElementById('kategori').value, // Ini yang dipakai untuk filtering
+                    kategori: document.getElementById('kategori').value,
                     catatan: document.getElementById('catatan').value,
+                    // Link tambahan
                     link_overleaf: document.getElementById('link_overleaf').value || null,
+                    link_ppt: document.getElementById('link_ppt').value || null,
+                    link_submission: document.getElementById('link_submission').value || null,
                 };
 
                 let error;
