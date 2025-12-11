@@ -29,7 +29,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-3 md:py-0 gap-4">
                 <div class="flex items-center gap-3 flex-shrink-0 w-full md:w-auto">
                     <i class="fa-solid fa-layer-group text-blue-600 text-2xl"></i>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Manajemen Karya</h1>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Manajemen Peternakan</h1>
                 </div>
 
                 <!-- Submenu Tabs -->
@@ -43,7 +43,7 @@
                     <button onclick="switchType('Proposal')" id="tab-Proposal" class="px-4 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap">
                         <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Proposal
                     </button>
-                    <!-- Menu Baru: Referensi -->
+                    <!-- Menu Referensi -->
                     <button onclick="switchType('Referensi')" id="tab-Referensi" class="px-4 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap text-slate-500 hover:text-slate-700">
                         <i class="fa-solid fa-book-bookmark mr-2"></i>Referensi
                     </button>
@@ -74,9 +74,10 @@
         
         <!-- Toolbar -->
         <div class="flex flex-col xl:flex-row justify-between items-center mb-4 gap-4">
-            <div class="flex flex-col sm:flex-row items-center gap-2 w-full xl:w-auto">
-                <div class="relative w-full sm:w-48">
-                    <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <div class="flex flex-col sm:flex-row items-center gap-2 w-full xl:w-auto flex-wrap">
+                <!-- Status Filter -->
+                <div class="relative w-full sm:w-40 lg:w-48">
+                    <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm cursor-pointer">
                         <option value="all">Semua Status</option>
                         <option value="Belum Diapapakan">Belum Diapapakan</option>
                         <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
@@ -85,20 +86,33 @@
                         <option value="Rejected">Rejected</option>
                     </select>
                 </div>
-                <div class="relative w-full sm:w-48">
-                    <select id="categoryFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="all">Semua Kategori</option>
+
+                <!-- Target/Jenis Filter -->
+                <div class="relative w-full sm:w-40 lg:w-48">
+                    <select id="targetFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm cursor-pointer">
+                        <option value="all">Semua Target</option>
+                        <!-- Populated dynamically -->
                     </select>
                 </div>
-                <div class="relative w-full sm:w-48">
-                    <select id="sortOption" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+                <!-- Category Filter -->
+                <div class="relative w-full sm:w-40 lg:w-48">
+                    <select id="categoryFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm cursor-pointer">
+                        <option value="all">Semua Kategori</option>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Sort Option -->
+                <div class="relative w-full sm:w-40 lg:w-48">
+                    <select id="sortOption" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm cursor-pointer">
                         <option value="deadline_asc">Deadline (Terdekat)</option>
                         <option value="deadline_desc">Deadline (Terlama)</option>
                         <option value="title_asc">Judul (A-Z)</option>
                     </select>
                 </div>
             </div>
-            <div class="text-sm text-slate-500 whitespace-nowrap">
+            <div class="text-sm text-slate-500 whitespace-nowrap ml-auto">
                 Menampilkan <span id="currentTypeLabel" class="font-bold">Paper</span>: <span id="totalCount" class="font-semibold text-slate-700">0</span> item
             </div>
         </div>
@@ -159,7 +173,7 @@
                     <form id="paperForm" class="p-6">
                         <input type="hidden" id="paperId">
                         <input type="hidden" id="jenisInput">
-                        <!-- Menyimpan URL file yang sudah diupload (untuk edit mode) -->
+                        <!-- Menyimpan URL file yang sudah diupload -->
                         <input type="hidden" id="existingFileUrl"> 
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,8 +193,8 @@
                                         <label class="block text-xs font-medium text-slate-700 mb-1">Status</label>
                                         <select id="status" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                             <option value="Belum Diapapakan">Pending / Tersedia</option>
-                                            <option value="Sedang Dikerjakan">Sedang Dibaca</option>
-                                            <option value="Sudah Submit">Selesai</option>
+                                            <option value="Sedang Dikerjakan">Sedang Dibaca / Dikerjakan</option>
+                                            <option value="Sudah Submit">Selesai / Submit</option>
                                             <option value="Accepted">Accepted</option>
                                         </select>
                                     </div>
@@ -199,7 +213,7 @@
 
                             <!-- Kolom Kanan -->
                             <div class="space-y-4">
-                                <!-- Area Upload File (Hanya aktif untuk Referensi, tapi kita tampilkan umum) -->
+                                <!-- Area Upload File -->
                                 <div id="uploadSection" class="p-3 bg-blue-50 rounded-lg border border-blue-100">
                                     <label class="block text-xs font-bold text-blue-800 mb-1">
                                         <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload File (PDF/Gambar)
@@ -228,7 +242,8 @@
                                         <input type="text" id="biaya" placeholder="$0.00" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Kategori</label>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Kategori / Topik</label>
+                                        <!-- Placeholder akan berubah dinamis -->
                                         <input type="text" id="kategori" placeholder="e.g. Quantum" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                 </div>
@@ -238,7 +253,6 @@
                                     <textarea id="catatan" rows="1" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"></textarea>
                                 </div>
                                 
-                                <!-- Fields lain disembunyikan untuk Referensi agar rapi, tapi ada di form data -->
                                 <div class="hidden">
                                     <input type="url" id="link_overleaf">
                                     <input type="url" id="link_ppt">
@@ -281,6 +295,7 @@
         let papers = [];
         let currentType = 'Paper'; 
         let currentFilterStatus = 'all';
+        let currentFilterTarget = 'all'; 
         let currentFilterCategory = 'all';
         let currentSortOption = 'deadline_asc';
         let currentSearchTerm = '';
@@ -291,6 +306,7 @@
         const emptyStateEl = document.getElementById('emptyState');
         const searchInput = document.getElementById('searchInput');
         const statusFilter = document.getElementById('statusFilter');
+        const targetFilter = document.getElementById('targetFilter'); 
         const categoryFilter = document.getElementById('categoryFilter');
         const sortOption = document.getElementById('sortOption');
         const totalCountEl = document.getElementById('totalCount');
@@ -322,19 +338,26 @@
             addBtnText.textContent = `Tambah ${type}`;
             
             // UI Tweaks per Type
+            let defaultTargetLabel = "Semua Target";
             if (type === 'Buku') {
                 headerJudul.textContent = 'Judul Buku';
                 headerTarget.textContent = 'Penerbit';
+                defaultTargetLabel = "Semua Penerbit";
             } else if (type === 'Proposal') {
                 headerJudul.textContent = 'Judul Proposal';
                 headerTarget.textContent = 'Skema / Hibah';
+                defaultTargetLabel = "Semua Skema";
             } else if (type === 'Referensi') {
                 headerJudul.textContent = 'Judul Referensi';
                 headerTarget.textContent = 'Jenis (Jurnal/Web)';
+                defaultTargetLabel = "Semua Jenis";
             } else {
                 headerJudul.textContent = 'Judul Paper';
                 headerTarget.textContent = 'Target Jurnal';
             }
+            
+            // Update default option text for filters
+            targetFilter.options[0].text = defaultTargetLabel;
 
             fetchPapers();
         }
@@ -379,7 +402,11 @@
             }
 
             papers = data || [];
+            
+            // Populate dynamic filters
             populateCategoryFilter();
+            populateTargetFilter(); 
+            
             applyFiltersAndSort();
         }
 
@@ -398,11 +425,8 @@
                 row.className = 'bg-white border-b border-slate-100 hover:bg-blue-50 transition-colors cursor-pointer';
                 row.onclick = () => editPaper(paper.id);
 
-                // Logic tampilan Link/File
                 let linkDisplay = '';
-                // Jika ada link referensi (yang kita gunakan juga untuk simpan URL file upload)
                 if (paper.link_referensi) {
-                    // Cek apakah itu file dari supabase storage atau link biasa
                     const isFile = paper.link_referensi.includes('supabase') && paper.link_referensi.includes('/storage/');
                     if (isFile) {
                          linkDisplay = `<a href="${paper.link_referensi}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium"><i class="fa-solid fa-file-arrow-down mr-1"></i> Lihat File</a>`;
@@ -418,7 +442,11 @@
                 row.innerHTML = `
                     <td class="px-4 py-4 font-mono text-xs text-slate-500 whitespace-nowrap">${formatDate(paper.deadline)}</td>
                     <td class="px-4 py-4 text-slate-600 text-xs">${paper.penulis || '-'}</td>
-                    <td class="px-4 py-4 font-medium text-slate-900">${paper.judul || 'Tanpa Judul'}<div class="text-xs text-slate-400 font-normal mt-0.5">${paper.kategori || ''}</div></td>
+                    <td class="px-4 py-4 font-medium text-slate-900">
+                        ${paper.judul || 'Tanpa Judul'}
+                        <!-- Menampilkan Kategori dengan jelas di tabel -->
+                        <div class="text-xs text-blue-600 font-normal mt-0.5 bg-blue-50 inline-block px-1.5 py-0.5 rounded">${paper.kategori || 'Tanpa Kategori'}</div>
+                    </td>
                     <td class="px-4 py-4 whitespace-nowrap">${getStatusBadge(paper.status)}</td>
                     <td class="px-4 py-4 text-slate-600 text-xs">${paper.target_jurnal || '-'}</td>
                     <td class="px-4 py-4 whitespace-nowrap relative z-10">${linkDisplay}</td>
@@ -437,12 +465,18 @@
         function openModal(isEdit = false) {
             modal.classList.remove('hidden');
             
-            // Label customization
             const typeLabels = { 'Buku': 'Judul Buku', 'Proposal': 'Judul Proposal', 'Referensi': 'Judul Referensi', 'Paper': 'Judul Paper' };
             document.getElementById('labelJudul').textContent = (typeLabels[currentType] || 'Judul') + ' *';
-            document.getElementById('labelTarget').textContent = currentType === 'Buku' ? 'Penerbit' : (currentType === 'Referensi' ? 'Jenis Sumber' : 'Target Jurnal');
+            document.getElementById('labelTarget').textContent = currentType === 'Buku' ? 'Penerbit' : (currentType === 'Referensi' ? 'Jenis Sumber (e.g. Jurnal/Web)' : 'Target Jurnal');
 
-            // Reset File Input
+            // --- UX: Custom Placeholder untuk Kategori Referensi ---
+            const kategoriInput = document.getElementById('kategori');
+            if (currentType === 'Referensi') {
+                kategoriInput.placeholder = "e.g. Classical, Quantum Biology, Photonic";
+            } else {
+                kategoriInput.placeholder = "e.g. Q2, Scopus";
+            }
+
             fileUpload.value = '';
             filePreviewLink.classList.add('hidden');
 
@@ -472,11 +506,9 @@
             document.getElementById('target_jurnal').value = paper.target_jurnal || '';
             document.getElementById('penulis').value = paper.penulis || '';
             
-            // Map Link Referensi to File Logic
             document.getElementById('link_referensi').value = paper.link_referensi || '';
-            document.getElementById('existingFileUrl').value = paper.link_referensi || ''; // Simpan URL lama
+            document.getElementById('existingFileUrl').value = paper.link_referensi || '';
 
-            // Show preview if it's a file
             if (paper.link_referensi && paper.link_referensi.includes('/storage/')) {
                 filePreviewLink.classList.remove('hidden');
                 filePreviewLink.querySelector('a').href = paper.link_referensi;
@@ -495,7 +527,6 @@
             e.preventDefault();
             const saveBtn = document.getElementById('saveBtn');
             const originalText = saveBtn.innerText;
-            
             saveBtn.disabled = true;
             
             try {
@@ -503,39 +534,22 @@
                 const fileInput = document.getElementById('fileUpload');
                 let finalFileUrl = document.getElementById('existingFileUrl').value;
 
-                // --- 1. UPLOAD LOGIC ---
                 if (fileInput.files.length > 0) {
                     saveBtn.innerText = 'Mengupload File...';
                     const file = fileInput.files[0];
-                    // Buat nama file unik: timestamp_namafile
-                    // Sanitasi nama file agar aman
                     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
                     const fileName = `${Date.now()}_${sanitizedName}`;
-
-                    const { data, error: uploadError } = await db.storage
-                        .from(STORAGE_BUCKET)
-                        .upload(fileName, file);
-
+                    const { data, error: uploadError } = await db.storage.from(STORAGE_BUCKET).upload(fileName, file);
                     if (uploadError) throw uploadError;
-
-                    // Get Public URL
-                    const { data: publicUrlData } = db.storage
-                        .from(STORAGE_BUCKET)
-                        .getPublicUrl(fileName);
-                    
+                    const { data: publicUrlData } = db.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
                     finalFileUrl = publicUrlData.publicUrl;
                 }
                 
-                // Jika user mengisi link manual dan TIDAK upload file, pakai link manual
                 if (fileInput.files.length === 0 && document.getElementById('link_referensi').value) {
-                    // Cek apakah link manual beda dengan existing file url (artinya user ganti link manual)
                     const manualLink = document.getElementById('link_referensi').value;
-                    if (!manualLink.includes('/storage/')) {
-                        finalFileUrl = manualLink;
-                    }
+                    if (!manualLink.includes('/storage/')) { finalFileUrl = manualLink; }
                 }
 
-                // --- 2. SAVE DATA ---
                 saveBtn.innerText = 'Menyimpan Data...';
 
                 const formData = {
@@ -545,12 +559,10 @@
                     status: document.getElementById('status').value,
                     target_jurnal: document.getElementById('target_jurnal').value,
                     penulis: document.getElementById('penulis').value,
-                    // Kita simpan URL file atau Link manual di kolom link_referensi
                     link_referensi: finalFileUrl, 
                     biaya: document.getElementById('biaya').value,
-                    kategori: document.getElementById('kategori').value,
+                    kategori: document.getElementById('kategori').value, // Ini yang dipakai untuk filtering
                     catatan: document.getElementById('catatan').value,
-                    // Hidden fields mapping (prevent null overwrites if not in form)
                     link_overleaf: document.getElementById('link_overleaf').value || null,
                 };
 
@@ -562,13 +574,10 @@
                     const res = await db.from('papers').insert([formData]);
                     error = res.error;
                 }
-
                 if (error) throw error;
-
                 closeModal();
                 showToast('Berhasil disimpan!');
                 fetchPapers();
-
             } catch (err) {
                 console.error(err);
                 alert('Terjadi kesalahan: ' + (err.message || 'Cek console'));
@@ -580,24 +589,39 @@
 
         async function deletePaper(id) {
             if(!confirm('Hapus data ini?')) return;
-            // Note: Idealnya kita juga hapus file di storage jika ada, tapi untuk simpelnya kita hapus record db saja dulu.
             const { error } = await db.from('papers').delete().eq('id', id);
             if (!error) { showToast('Terhapus'); fetchPapers(); }
         }
 
-        // --- FILTER & SORT (Reuse logic) ---
+        // --- FILTER & SORT ---
         function populateCategoryFilter() {
+            // Mengambil semua kategori unik dari data yang sedang ditampilkan (Paper/Buku/Referensi)
             const categories = [...new Set(papers.map(p => p.kategori).filter(k => k && k.trim() !== ''))].sort();
             categoryFilter.innerHTML = '<option value="all">Semua Kategori</option>';
             categories.forEach(c => categoryFilter.innerHTML += `<option value="${c}">${c}</option>`);
+            
+            // Restore selection
             categoryFilter.value = currentFilterCategory;
+            if (categoryFilter.value !== currentFilterCategory) { categoryFilter.value = 'all'; currentFilterCategory = 'all'; }
+        }
+
+        function populateTargetFilter() {
+            const targets = [...new Set(papers.map(p => p.target_jurnal).filter(t => t && t.trim() !== ''))].sort();
+            const defaultLabel = targetFilter.options[0].text;
+            targetFilter.innerHTML = `<option value="all">${defaultLabel}</option>`;
+            targets.forEach(t => targetFilter.innerHTML += `<option value="${t}">${t}</option>`);
+            
+            targetFilter.value = currentFilterTarget;
+            if (targetFilter.value !== currentFilterTarget) { targetFilter.value = 'all'; currentFilterTarget = 'all'; }
         }
 
         function applyFiltersAndSort() {
             let result = [...papers];
             if (currentSearchTerm) result = result.filter(p => (p.judul||'').toLowerCase().includes(currentSearchTerm) || (p.penulis||'').toLowerCase().includes(currentSearchTerm));
+            
             if (currentFilterStatus !== 'all') result = result.filter(p => p.status === currentFilterStatus);
             if (currentFilterCategory !== 'all') result = result.filter(p => p.kategori === currentFilterCategory);
+            if (currentFilterTarget !== 'all') result = result.filter(p => p.target_jurnal === currentFilterTarget);
             
             result.sort((a, b) => {
                 if (currentSortOption === 'deadline_asc') return (new Date(a.deadline||'9999-12-31') - new Date(b.deadline||'9999-12-31'));
@@ -612,6 +636,7 @@
         searchInput.addEventListener('input', (e) => { currentSearchTerm = e.target.value.toLowerCase(); applyFiltersAndSort(); });
         statusFilter.addEventListener('change', (e) => { currentFilterStatus = e.target.value; applyFiltersAndSort(); });
         categoryFilter.addEventListener('change', (e) => { currentFilterCategory = e.target.value; applyFiltersAndSort(); });
+        targetFilter.addEventListener('change', (e) => { currentFilterTarget = e.target.value; applyFiltersAndSort(); }); 
         sortOption.addEventListener('change', (e) => { currentSortOption = e.target.value; applyFiltersAndSort(); });
         function showToast(msg, type) { 
             const t = document.getElementById('toast'); 
