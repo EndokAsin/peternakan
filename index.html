@@ -15,23 +15,10 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         
-        /* Custom Scrollbar untuk tabel */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .custom-scroll::-webkit-scrollbar {
-            height: 8px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #c1c1c1; 
-            border-radius: 4px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8; 
-        }
+        .custom-scroll::-webkit-scrollbar { height: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -40,36 +27,39 @@
     <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-3 md:py-0 gap-4">
-                <!-- Logo & Title -->
                 <div class="flex items-center gap-3 flex-shrink-0 w-full md:w-auto">
                     <i class="fa-solid fa-layer-group text-blue-600 text-2xl"></i>
-                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Manajemen Peternakan</h1>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Manajemen Karya</h1>
                 </div>
 
-                <!-- Submenu Tabs (NEW) -->
-                <div class="flex bg-slate-100 p-1 rounded-lg overflow-x-auto w-full md:w-auto">
-                    <button onclick="switchType('Paper')" id="tab-Paper" class="px-4 py-1.5 text-sm font-medium rounded-md transition-all w-full md:w-auto whitespace-nowrap bg-white text-blue-600 shadow-sm">
+                <!-- Submenu Tabs -->
+                <div class="flex bg-slate-100 p-1 rounded-lg overflow-x-auto w-full md:w-auto scrollbar-hide">
+                    <button onclick="switchType('Paper')" id="tab-Paper" class="px-4 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap">
                         <i class="fa-solid fa-file-lines mr-2"></i>Paper
                     </button>
-                    <button onclick="switchType('Buku')" id="tab-Buku" class="px-4 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all w-full md:w-auto whitespace-nowrap">
+                    <button onclick="switchType('Buku')" id="tab-Buku" class="px-4 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap">
                         <i class="fa-solid fa-book mr-2"></i>Buku
                     </button>
-                    <button onclick="switchType('Proposal')" id="tab-Proposal" class="px-4 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all w-full md:w-auto whitespace-nowrap">
+                    <button onclick="switchType('Proposal')" id="tab-Proposal" class="px-4 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap">
                         <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Proposal
+                    </button>
+                    <!-- Menu Baru: Referensi -->
+                    <button onclick="switchType('Referensi')" id="tab-Referensi" class="px-4 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap text-slate-500 hover:text-slate-700">
+                        <i class="fa-solid fa-book-bookmark mr-2"></i>Referensi
                     </button>
                 </div>
 
-                <!-- Search Bar -->
+                <!-- Search -->
                 <div class="flex-1 max-w-sm w-full">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fa-solid fa-search text-slate-400"></i>
                         </div>
-                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-500 focus:outline-none focus:bg-white focus:placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Cari judul atau penulis...">
+                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm transition" placeholder="Cari judul/penulis...">
                     </div>
                 </div>
 
-                <!-- Action Button -->
+                <!-- Add Button -->
                 <div class="flex items-center flex-shrink-0 w-full md:w-auto justify-end">
                     <button onclick="openModal(); event.stopPropagation()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-blue-500/30 flex items-center gap-2 whitespace-nowrap w-full md:w-auto justify-center">
                         <i class="fa-solid fa-plus"></i> <span id="addBtnText">Tambah Paper</span>
@@ -82,37 +72,29 @@
     <!-- Main Content -->
     <main class="max-w-[95%] mx-auto py-8">
         
-        <!-- Filter & Sort Toolbar -->
+        <!-- Toolbar -->
         <div class="flex flex-col xl:flex-row justify-between items-center mb-4 gap-4">
             <div class="flex flex-col sm:flex-row items-center gap-2 w-full xl:w-auto">
-                <!-- Filter Status -->
                 <div class="relative w-full sm:w-48">
-                    <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
+                    <select id="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                         <option value="all">Semua Status</option>
                         <option value="Belum Diapapakan">Belum Diapapakan</option>
                         <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-                        <option value="Ada Masalah">Ada Masalah</option>
                         <option value="Sudah Submit">Sudah Submit</option>
                         <option value="Accepted">Accepted</option>
                         <option value="Rejected">Rejected</option>
                     </select>
                 </div>
-
-                <!-- Filter Kategori -->
                 <div class="relative w-full sm:w-48">
-                    <select id="categoryFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
+                    <select id="categoryFilter" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                         <option value="all">Semua Kategori</option>
-                        <!-- Options will be populated dynamically -->
                     </select>
                 </div>
-
-                <!-- Sort Option -->
                 <div class="relative w-full sm:w-48">
-                    <select id="sortOption" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer">
+                    <select id="sortOption" class="block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                         <option value="deadline_asc">Deadline (Terdekat)</option>
                         <option value="deadline_desc">Deadline (Terlama)</option>
                         <option value="title_asc">Judul (A-Z)</option>
-                        <option value="title_desc">Judul (Z-A)</option>
                     </select>
                 </div>
             </div>
@@ -121,32 +103,30 @@
             </div>
         </div>
         
-        <!-- Loading State -->
+        <!-- Loading -->
         <div id="loading" class="text-center py-20 hidden">
             <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
             <p class="mt-4 text-slate-500">Memuat data...</p>
         </div>
 
-        <!-- Table Container -->
+        <!-- Table -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
             <div class="overflow-x-auto custom-scroll pb-4">
                 <table class="w-full text-sm text-left">
                     <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200">
                         <tr>
-                            <th scope="col" class="px-4 py-3 min-w-[100px]">Deadline</th>
+                            <th scope="col" class="px-4 py-3 min-w-[100px]">Deadline/Tahun</th>
                             <th scope="col" class="px-4 py-3 min-w-[150px]">Penulis</th>
                             <th scope="col" class="px-4 py-3 min-w-[250px]" id="headerJudul">Judul Paper</th>
                             <th scope="col" class="px-4 py-3 min-w-[150px]">Status</th>
                             <th scope="col" class="px-4 py-3 min-w-[150px]" id="headerTarget">Target Jurnal</th>
-                            <th scope="col" class="px-4 py-3 min-w-[100px]">Links</th>
+                            <th scope="col" class="px-4 py-3 min-w-[100px]">File/Links</th>
                             <th scope="col" class="px-4 py-3 min-w-[100px]">Biaya</th>
                             <th scope="col" class="px-4 py-3 min-w-[200px]">Catatan</th>
                             <th scope="col" class="px-4 py-3 min-w-[100px] text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="paperTableBody" class="divide-y divide-slate-100">
-                        <!-- Data will be injected here -->
-                    </tbody>
+                    <tbody id="paperTableBody" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
             
@@ -156,15 +136,6 @@
                     <i class="fa-solid fa-folder-open text-3xl text-slate-400"></i>
                 </div>
                 <h3 class="text-lg font-medium text-slate-900" id="emptyStateTitle">Belum ada data</h3>
-                <p class="text-slate-500 mt-1 max-w-sm">Mulai tambahkan data baru untuk kategori ini.</p>
-            </div>
-
-            <!-- Not Found State (Search/Filter) -->
-            <div id="notFoundState" class="hidden flex flex-col items-center justify-center py-12 text-center">
-                <div class="text-slate-300 mb-2">
-                    <i class="fa-solid fa-filter text-3xl"></i>
-                </div>
-                <p class="text-slate-500">Tidak ada data yang cocok dengan filter atau pencarian.</p>
             </div>
         </div>
     </main>
@@ -176,7 +147,6 @@
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
                     
-                    <!-- Modal Header -->
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
                         <div class="flex justify-between items-center">
                             <h3 class="text-lg font-semibold leading-6 text-slate-900" id="modalTitle">Tambah Data Baru</h3>
@@ -186,11 +156,11 @@
                         </div>
                     </div>
 
-                    <!-- Modal Body -->
                     <form id="paperForm" class="p-6">
                         <input type="hidden" id="paperId">
-                        <!-- Hidden field for Jenis/Type -->
                         <input type="hidden" id="jenisInput">
+                        <!-- Menyimpan URL file yang sudah diupload (untuk edit mode) -->
+                        <input type="hidden" id="existingFileUrl"> 
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Kolom Kiri -->
@@ -202,67 +172,81 @@
                                 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Deadline</label>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Deadline / Tahun</label>
                                         <input type="date" id="deadline" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Status *</label>
-                                        <select id="status" required class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
-                                            <option value="Belum Diapapakan">Belum Diapapakan (Pending)</option>
-                                            <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-                                            <option value="Ada Masalah">Ada Masalah</option>
-                                            <option value="Sudah Submit">Sudah Submit</option>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Status</label>
+                                        <select id="status" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                            <option value="Belum Diapapakan">Pending / Tersedia</option>
+                                            <option value="Sedang Dikerjakan">Sedang Dibaca</option>
+                                            <option value="Sudah Submit">Selesai</option>
                                             <option value="Accepted">Accepted</option>
-                                            <option value="Rejected">Rejected</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1" id="labelTarget">Target Jurnal / Conference</label>
-                                    <input type="text" id="target_jurnal" placeholder="e.g. IEEE Access, Q1, Penerbit X" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                    <label class="block text-xs font-medium text-slate-700 mb-1" id="labelTarget">Target</label>
+                                    <input type="text" id="target_jurnal" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Penulis / Tim</label>
-                                    <input type="text" id="penulis" placeholder="e.g. MIB, MBG, MMR" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Penulis</label>
+                                    <input type="text" id="penulis" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                 </div>
                             </div>
 
                             <!-- Kolom Kanan -->
                             <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Tautan Penting</label>
-                                    <div class="space-y-2">
-                                        <input type="url" id="link_overleaf" placeholder="Link Dokumen/Overleaf" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_referensi" placeholder="Link Referensi/Sumber" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_ppt" placeholder="Link PPT/Canva/Design" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
-                                        <input type="url" id="link_submission" placeholder="Link Submission/Drive" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
+                                <!-- Area Upload File (Hanya aktif untuk Referensi, tapi kita tampilkan umum) -->
+                                <div id="uploadSection" class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                    <label class="block text-xs font-bold text-blue-800 mb-1">
+                                        <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload File (PDF/Gambar)
+                                    </label>
+                                    <input type="file" id="fileUpload" accept=".pdf,.doc,.docx,.jpg,.png" class="block w-full text-xs text-slate-500
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-full file:border-0
+                                      file:text-xs file:font-semibold
+                                      file:bg-blue-100 file:text-blue-700
+                                      hover:file:bg-blue-200
+                                    "/>
+                                    <p class="text-[10px] text-blue-600 mt-1">*File akan disimpan di Storage dan link otomatis masuk ke "Link Referensi".</p>
+                                    <div id="filePreviewLink" class="hidden mt-2 text-xs">
+                                        File saat ini: <a href="#" target="_blank" class="text-blue-600 underline truncate block">Lihat File</a>
                                     </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Link Manual (Jika tidak upload)</label>
+                                    <input type="url" id="link_referensi" placeholder="Link Referensi/Drive/Web" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2 text-xs">
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Biaya</label>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Biaya (Opsional)</label>
                                         <input type="text" id="biaya" placeholder="$0.00" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Kategori / Topik</label>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Kategori</label>
                                         <input type="text" id="kategori" placeholder="e.g. Quantum" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Catatan Penting</label>
-                                    <textarea id="catatan" rows="2" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"></textarea>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Catatan</label>
+                                    <textarea id="catatan" rows="1" class="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"></textarea>
+                                </div>
+                                
+                                <!-- Fields lain disembunyikan untuk Referensi agar rapi, tapi ada di form data -->
+                                <div class="hidden">
+                                    <input type="url" id="link_overleaf">
+                                    <input type="url" id="link_ppt">
+                                    <input type="url" id="link_submission">
+                                    <input type="text" id="mapping">
+                                    <input type="text" id="consensus">
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Technical Fields Hidden -->
-                        <div class="mt-4 hidden">
-                             <input type="text" id="mapping">
-                             <input type="text" id="consensus">
                         </div>
 
                         <div class="mt-6 flex justify-end gap-3">
@@ -290,10 +274,12 @@
         
         const { createClient } = supabase;
         const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Nama Bucket di Supabase Storage
+        const STORAGE_BUCKET = 'files'; 
 
         // --- 2. STATE ---
         let papers = [];
-        let currentType = 'Paper'; // 'Paper', 'Buku', or 'Proposal'
+        let currentType = 'Paper'; 
         let currentFilterStatus = 'all';
         let currentFilterCategory = 'all';
         let currentSortOption = 'deadline_asc';
@@ -303,7 +289,6 @@
         const tableBody = document.getElementById('paperTableBody');
         const loadingEl = document.getElementById('loading');
         const emptyStateEl = document.getElementById('emptyState');
-        const notFoundStateEl = document.getElementById('notFoundState');
         const searchInput = document.getElementById('searchInput');
         const statusFilter = document.getElementById('statusFilter');
         const categoryFilter = document.getElementById('categoryFilter');
@@ -315,188 +300,80 @@
         const headerTarget = document.getElementById('headerTarget');
         const modal = document.getElementById('paperModal');
         const form = document.getElementById('paperForm');
+        const fileUpload = document.getElementById('fileUpload');
+        const filePreviewLink = document.getElementById('filePreviewLink');
+        const existingFileUrl = document.getElementById('existingFileUrl');
 
-        // --- 4. SUBMENU LOGIC (NEW) ---
-        
+        // --- 4. SUBMENU LOGIC ---
         function switchType(type) {
             currentType = type;
             
-            // Update UI Tabs Styling
-            ['Paper', 'Buku', 'Proposal'].forEach(t => {
+            // Tab Styling
+            ['Paper', 'Buku', 'Proposal', 'Referensi'].forEach(t => {
                 const btn = document.getElementById(`tab-${t}`);
                 if (t === type) {
-                    btn.className = "px-4 py-1.5 text-sm font-medium rounded-md transition-all w-full md:w-auto whitespace-nowrap bg-white text-blue-600 shadow-sm ring-1 ring-slate-200";
+                    btn.className = "px-4 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap bg-white text-blue-600 shadow-sm ring-1 ring-slate-200";
                 } else {
-                    btn.className = "px-4 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all w-full md:w-auto whitespace-nowrap hover:bg-slate-50";
+                    btn.className = "px-4 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all whitespace-nowrap hover:bg-slate-50";
                 }
             });
 
-            // Update Labels
             currentTypeLabel.textContent = type;
             addBtnText.textContent = `Tambah ${type}`;
             
-            // Update Table Headers based on Type
+            // UI Tweaks per Type
             if (type === 'Buku') {
                 headerJudul.textContent = 'Judul Buku';
                 headerTarget.textContent = 'Penerbit';
             } else if (type === 'Proposal') {
                 headerJudul.textContent = 'Judul Proposal';
                 headerTarget.textContent = 'Skema / Hibah';
+            } else if (type === 'Referensi') {
+                headerJudul.textContent = 'Judul Referensi';
+                headerTarget.textContent = 'Jenis (Jurnal/Web)';
             } else {
                 headerJudul.textContent = 'Judul Paper';
                 headerTarget.textContent = 'Target Jurnal';
             }
 
-            // Fetch Data for new type
             fetchPapers();
         }
 
         // --- 5. HELPER FUNCTIONS ---
-        
         function getStatusBadge(status) {
             const s = (status || '').toLowerCase();
-            let classes = '';
-            let icon = '';
+            let classes = 'bg-slate-100 text-slate-600 border border-slate-200';
+            let icon = '<i class="fa-regular fa-clock mr-1"></i>';
 
-            if (s.includes('belum')) {
-                classes = 'bg-slate-100 text-slate-600 border border-slate-200';
-                icon = '<i class="fa-regular fa-clock mr-1"></i>';
-            } else if (s.includes('sedang')) {
-                classes = 'bg-blue-50 text-blue-700 border border-blue-200';
-                icon = '<i class="fa-solid fa-pencil mr-1"></i>';
-            } else if (s.includes('masalah')) {
-                classes = 'bg-purple-50 text-purple-700 border border-purple-200';
-                icon = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>';
-            } else if (s.includes('sudah submit')) {
-                classes = 'bg-lime-100 text-lime-800 border border-lime-300';
-                icon = '<i class="fa-solid fa-paper-plane mr-1"></i>';
-            } else if (s.includes('accepted')) {
-                classes = 'bg-green-600 text-white border border-green-700 shadow-sm';
-                icon = '<i class="fa-solid fa-check mr-1"></i>';
-            } else if (s.includes('rejected')) {
-                classes = 'bg-red-50 text-red-700 border border-red-200';
-                icon = '<i class="fa-solid fa-xmark mr-1"></i>';
-            } else {
-                classes = 'bg-slate-50 text-slate-500';
-            }
+            if (s.includes('sedang')) { classes = 'bg-blue-50 text-blue-700 border border-blue-200'; icon = '<i class="fa-solid fa-pencil mr-1"></i>'; }
+            else if (s.includes('sudah') || s.includes('selesai')) { classes = 'bg-lime-100 text-lime-800 border border-lime-300'; icon = '<i class="fa-solid fa-check mr-1"></i>'; }
+            else if (s.includes('accepted')) { classes = 'bg-green-600 text-white border border-green-700 shadow-sm'; icon = '<i class="fa-solid fa-check-double mr-1"></i>'; }
+            else if (s.includes('rejected')) { classes = 'bg-red-50 text-red-700 border border-red-200'; icon = '<i class="fa-solid fa-xmark mr-1"></i>'; }
 
             return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${classes}">${icon}${status || '-'}</span>`;
         }
 
         function formatDate(dateString) {
             if (!dateString) return '-';
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
+            return new Date(dateString).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
         }
 
-        function generateLinkIcon(url, iconClass, colorClass, tooltip) {
-            if (!url) return `<span class="text-slate-200"><i class="${iconClass}"></i></span>`;
-            return `<a href="${url}" target="_blank" title="${tooltip}" class="${colorClass} hover:opacity-75 transition z-10 relative" onclick="event.stopPropagation()"><i class="${iconClass}"></i></a>`;
-        }
-
-        function populateCategoryFilter() {
-            const categories = [...new Set(papers.map(p => p.kategori).filter(k => k && k.trim() !== ''))];
-            categories.sort(); 
-            categoryFilter.innerHTML = '<option value="all">Semua Kategori</option>';
-            categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                categoryFilter.appendChild(option);
-            });
-            categoryFilter.value = currentFilterCategory;
-            if (categoryFilter.value !== currentFilterCategory) {
-                currentFilterCategory = 'all';
-                categoryFilter.value = 'all';
-            }
-        }
-
-        // --- 6. FILTER & SORT LOGIC ---
-        
-        function applyFiltersAndSort() {
-            let result = [...papers];
-
-            // Filter by Search
-            if (currentSearchTerm) {
-                result = result.filter(paper => {
-                    const judul = (paper.judul || '').toLowerCase();
-                    const penulis = (paper.penulis || '').toLowerCase();
-                    return judul.includes(currentSearchTerm) || penulis.includes(currentSearchTerm);
-                });
-            }
-
-            // Filter by Status
-            if (currentFilterStatus !== 'all') {
-                result = result.filter(paper => {
-                    const s = (paper.status || '').toLowerCase();
-                    const filter = currentFilterStatus.toLowerCase();
-                    return s === filter;
-                });
-            }
-
-            // Filter by Category
-            if (currentFilterCategory !== 'all') {
-                result = result.filter(paper => paper.kategori === currentFilterCategory);
-            }
-
-            // Sort
-            result.sort((a, b) => {
-                if (currentSortOption === 'deadline_asc') {
-                    if (!a.deadline) return 1; if (!b.deadline) return -1;
-                    return new Date(a.deadline) - new Date(b.deadline);
-                } else if (currentSortOption === 'deadline_desc') {
-                    if (!a.deadline) return 1; if (!b.deadline) return -1;
-                    return new Date(b.deadline) - new Date(a.deadline);
-                } else if (currentSortOption === 'title_asc') {
-                    return (a.judul || '').localeCompare(b.judul || '');
-                } else if (currentSortOption === 'title_desc') {
-                    return (b.judul || '').localeCompare(a.judul || '');
-                }
-                return 0;
-            });
-
-            renderTable(result);
-        }
-
-        searchInput.addEventListener('input', (e) => {
-            currentSearchTerm = e.target.value.toLowerCase();
-            applyFiltersAndSort();
-        });
-
-        statusFilter.addEventListener('change', (e) => {
-            currentFilterStatus = e.target.value;
-            applyFiltersAndSort();
-        });
-        
-        categoryFilter.addEventListener('change', (e) => {
-            currentFilterCategory = e.target.value;
-            applyFiltersAndSort();
-        });
-
-        sortOption.addEventListener('change', (e) => {
-            currentSortOption = e.target.value;
-            applyFiltersAndSort();
-        });
-
-        // --- 7. CORE FUNCTIONS ---
-
+        // --- 6. CORE LOGIC ---
         async function fetchPapers() {
             loadingEl.classList.remove('hidden');
             tableBody.innerHTML = '';
             emptyStateEl.classList.add('hidden');
-            notFoundStateEl.classList.add('hidden');
 
-            // FETCH DATA BASED ON CURRENT TYPE
             const { data, error } = await db
                 .from('papers')
                 .select('*')
-                .eq('jenis', currentType) // Filter by Type directly from DB
+                .eq('jenis', currentType)
                 .order('deadline', { ascending: true });
 
             loadingEl.classList.add('hidden');
 
             if (error) {
-                console.error('Error fetching:', error);
+                console.error(error);
                 showToast('Gagal mengambil data.', 'error');
                 return;
             }
@@ -509,206 +386,242 @@
         function renderTable(dataToRender) {
             tableBody.innerHTML = '';
             totalCountEl.textContent = dataToRender.length;
-            emptyStateEl.classList.add('hidden');
-            notFoundStateEl.classList.add('hidden');
-
-            if (papers.length === 0) {
-                document.getElementById('emptyStateTitle').textContent = `Belum ada data ${currentType}`;
-                emptyStateEl.classList.remove('hidden');
-                return;
-            }
 
             if (dataToRender.length === 0) {
-                notFoundStateEl.classList.remove('hidden');
+                emptyStateEl.classList.remove('hidden');
+                document.getElementById('emptyStateTitle').textContent = papers.length === 0 ? `Belum ada data ${currentType}` : 'Tidak ditemukan';
                 return;
             }
 
             dataToRender.forEach(paper => {
                 const row = document.createElement('tr');
-                row.className = 'bg-white border-b border-slate-100 hover:bg-blue-50 transition-colors cursor-pointer group relative';
+                row.className = 'bg-white border-b border-slate-100 hover:bg-blue-50 transition-colors cursor-pointer';
                 row.onclick = () => editPaper(paper.id);
-                
-                const linksHtml = `
-                    <div class="flex gap-3 text-lg" onclick="event.stopPropagation()">
-                        ${generateLinkIcon(paper.link_overleaf, 'fa-solid fa-file-code', 'text-green-600', 'Dokumen')}
-                        ${generateLinkIcon(paper.link_referensi, 'fa-solid fa-book', 'text-blue-500', 'Referensi')}
-                        ${generateLinkIcon(paper.link_ppt, 'fa-solid fa-file-powerpoint', 'text-orange-500', 'Design/PPT')}
-                        ${generateLinkIcon(paper.link_submission, 'fa-solid fa-upload', 'text-purple-500', 'Submission')}
-                    </div>
-                `;
+
+                // Logic tampilan Link/File
+                let linkDisplay = '';
+                // Jika ada link referensi (yang kita gunakan juga untuk simpan URL file upload)
+                if (paper.link_referensi) {
+                    // Cek apakah itu file dari supabase storage atau link biasa
+                    const isFile = paper.link_referensi.includes('supabase') && paper.link_referensi.includes('/storage/');
+                    if (isFile) {
+                         linkDisplay = `<a href="${paper.link_referensi}" target="_blank" onclick="event.stopPropagation()" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium"><i class="fa-solid fa-file-arrow-down mr-1"></i> Lihat File</a>`;
+                    } else {
+                         linkDisplay = `<a href="${paper.link_referensi}" target="_blank" onclick="event.stopPropagation()" class="text-blue-500 hover:underline"><i class="fa-solid fa-link mr-1"></i> Link</a>`;
+                    }
+                } else if (paper.link_overleaf) {
+                    linkDisplay = `<a href="${paper.link_overleaf}" target="_blank" onclick="event.stopPropagation()" class="text-green-600 hover:underline"><i class="fa-solid fa-file-code mr-1"></i> Doc</a>`;
+                } else {
+                    linkDisplay = '<span class="text-slate-300">-</span>';
+                }
 
                 row.innerHTML = `
-                    <td class="px-4 py-4 font-mono text-xs text-slate-500 whitespace-nowrap">
-                        ${formatDate(paper.deadline)}
-                    </td>
-                    <td class="px-4 py-4 text-slate-600 text-xs">
-                        ${paper.penulis || '-'}
-                    </td>
-                    <td class="px-4 py-4 font-medium text-slate-900">
-                        ${paper.judul || 'Tanpa Judul'}
-                        <div class="text-xs text-slate-400 font-normal mt-0.5">${paper.kategori || ''}</div>
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
-                        ${getStatusBadge(paper.status)}
-                    </td>
-                    <td class="px-4 py-4 text-slate-600 text-xs">
-                        ${paper.target_jurnal || '-'}
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap relative z-10">
-                        ${linksHtml}
-                    </td>
-                    <td class="px-4 py-4 text-slate-600 text-xs font-mono">
-                        ${paper.biaya || '-'}
-                    </td>
-                    <td class="px-4 py-4 text-slate-500 text-xs italic max-w-xs truncate" title="${paper.catatan || ''}">
-                        ${paper.catatan || '-'}
-                    </td>
+                    <td class="px-4 py-4 font-mono text-xs text-slate-500 whitespace-nowrap">${formatDate(paper.deadline)}</td>
+                    <td class="px-4 py-4 text-slate-600 text-xs">${paper.penulis || '-'}</td>
+                    <td class="px-4 py-4 font-medium text-slate-900">${paper.judul || 'Tanpa Judul'}<div class="text-xs text-slate-400 font-normal mt-0.5">${paper.kategori || ''}</div></td>
+                    <td class="px-4 py-4 whitespace-nowrap">${getStatusBadge(paper.status)}</td>
+                    <td class="px-4 py-4 text-slate-600 text-xs">${paper.target_jurnal || '-'}</td>
+                    <td class="px-4 py-4 whitespace-nowrap relative z-10">${linkDisplay}</td>
+                    <td class="px-4 py-4 text-slate-600 text-xs font-mono">${paper.biaya || '-'}</td>
+                    <td class="px-4 py-4 text-slate-500 text-xs italic max-w-xs truncate" title="${paper.catatan || ''}">${paper.catatan || '-'}</td>
                     <td class="px-4 py-4 whitespace-nowrap text-center relative z-10" onclick="event.stopPropagation()">
-                        <button onclick="editPaper(${paper.id})" class="text-blue-600 hover:text-blue-900 mx-1 p-1 rounded hover:bg-blue-100 transition"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deletePaper(${paper.id})" class="text-red-400 hover:text-red-700 mx-1 p-1 rounded hover:bg-red-100 transition"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="editPaper(${paper.id})" class="text-blue-600 hover:text-blue-900 mx-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deletePaper(${paper.id})" class="text-red-400 hover:text-red-700 mx-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tableBody.appendChild(row);
             });
         }
 
-        // --- 8. MODAL & FORM LOGIC ---
-
+        // --- 7. MODAL & UPLOAD LOGIC ---
         function openModal(isEdit = false) {
             modal.classList.remove('hidden');
             
-            // Adjust label modal based on current type
-            if (currentType === 'Buku') {
-                document.getElementById('labelJudul').textContent = 'Judul Buku *';
-                document.getElementById('labelTarget').textContent = 'Penerbit';
-            } else if (currentType === 'Proposal') {
-                document.getElementById('labelJudul').textContent = 'Judul Proposal *';
-                document.getElementById('labelTarget').textContent = 'Skema / Hibah';
-            } else {
-                document.getElementById('labelJudul').textContent = 'Judul Paper *';
-                document.getElementById('labelTarget').textContent = 'Target Jurnal / Conference';
-            }
+            // Label customization
+            const typeLabels = { 'Buku': 'Judul Buku', 'Proposal': 'Judul Proposal', 'Referensi': 'Judul Referensi', 'Paper': 'Judul Paper' };
+            document.getElementById('labelJudul').textContent = (typeLabels[currentType] || 'Judul') + ' *';
+            document.getElementById('labelTarget').textContent = currentType === 'Buku' ? 'Penerbit' : (currentType === 'Referensi' ? 'Jenis Sumber' : 'Target Jurnal');
+
+            // Reset File Input
+            fileUpload.value = '';
+            filePreviewLink.classList.add('hidden');
 
             if (!isEdit) {
-                document.getElementById('modalTitle').textContent = `Tambah ${currentType} Baru`;
+                document.getElementById('modalTitle').textContent = `Tambah ${currentType}`;
                 form.reset();
                 document.getElementById('paperId').value = '';
+                document.getElementById('jenisInput').value = currentType;
                 document.getElementById('status').value = 'Belum Diapapakan';
-                document.getElementById('jenisInput').value = currentType; // Set hidden input
+                document.getElementById('existingFileUrl').value = '';
             } else {
                 document.getElementById('modalTitle').textContent = `Edit ${currentType}`;
             }
         }
 
-        function closeModal() {
-            modal.classList.add('hidden');
-        }
+        function closeModal() { modal.classList.add('hidden'); }
 
         function editPaper(id) {
             const paper = papers.find(p => p.id === id);
             if (!paper) return;
 
-            // Ensure we are in the correct tab, though user clicked it so we should be
             document.getElementById('paperId').value = paper.id;
-            document.getElementById('jenisInput').value = paper.jenis || 'Paper';
+            document.getElementById('jenisInput').value = paper.jenis || currentType;
             document.getElementById('judul').value = paper.judul || '';
             document.getElementById('deadline').value = paper.deadline || '';
             document.getElementById('status').value = paper.status || 'Belum Diapapakan';
             document.getElementById('target_jurnal').value = paper.target_jurnal || '';
             document.getElementById('penulis').value = paper.penulis || '';
-            document.getElementById('link_overleaf').value = paper.link_overleaf || '';
+            
+            // Map Link Referensi to File Logic
             document.getElementById('link_referensi').value = paper.link_referensi || '';
-            document.getElementById('link_ppt').value = paper.link_ppt || '';
-            document.getElementById('link_submission').value = paper.link_submission || '';
+            document.getElementById('existingFileUrl').value = paper.link_referensi || ''; // Simpan URL lama
+
+            // Show preview if it's a file
+            if (paper.link_referensi && paper.link_referensi.includes('/storage/')) {
+                filePreviewLink.classList.remove('hidden');
+                filePreviewLink.querySelector('a').href = paper.link_referensi;
+            } else {
+                filePreviewLink.classList.add('hidden');
+            }
+
             document.getElementById('biaya').value = paper.biaya || '';
             document.getElementById('kategori').value = paper.kategori || '';
             document.getElementById('catatan').value = paper.catatan || '';
-            document.getElementById('mapping').value = paper.mapping || '';
-            document.getElementById('consensus').value = paper.consensus || '';
-
+            
             openModal(true);
         }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const saveBtn = document.getElementById('saveBtn');
-            const originalBtnText = saveBtn.innerText;
-            saveBtn.innerText = 'Menyimpan...';
-            saveBtn.disabled = true;
-
-            const id = document.getElementById('paperId').value;
+            const originalText = saveBtn.innerText;
             
-            const formData = {
-                jenis: document.getElementById('jenisInput').value || currentType, // Important
-                judul: document.getElementById('judul').value,
-                deadline: document.getElementById('deadline').value || null,
-                status: document.getElementById('status').value,
-                target_jurnal: document.getElementById('target_jurnal').value,
-                penulis: document.getElementById('penulis').value,
-                link_overleaf: document.getElementById('link_overleaf').value,
-                link_referensi: document.getElementById('link_referensi').value,
-                link_ppt: document.getElementById('link_ppt').value,
-                link_submission: document.getElementById('link_submission').value,
-                biaya: document.getElementById('biaya').value,
-                kategori: document.getElementById('kategori').value,
-                catatan: document.getElementById('catatan').value,
-                mapping: document.getElementById('mapping').value,
-                consensus: document.getElementById('consensus').value,
-            };
+            saveBtn.disabled = true;
+            
+            try {
+                const id = document.getElementById('paperId').value;
+                const fileInput = document.getElementById('fileUpload');
+                let finalFileUrl = document.getElementById('existingFileUrl').value;
 
-            let error;
-            if (id) {
-                const res = await db.from('papers').update(formData).eq('id', id);
-                error = res.error;
-            } else {
-                const res = await db.from('papers').insert([formData]);
-                error = res.error;
-            }
+                // --- 1. UPLOAD LOGIC ---
+                if (fileInput.files.length > 0) {
+                    saveBtn.innerText = 'Mengupload File...';
+                    const file = fileInput.files[0];
+                    // Buat nama file unik: timestamp_namafile
+                    // Sanitasi nama file agar aman
+                    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+                    const fileName = `${Date.now()}_${sanitizedName}`;
 
-            saveBtn.innerText = originalBtnText;
-            saveBtn.disabled = false;
+                    const { data, error: uploadError } = await db.storage
+                        .from(STORAGE_BUCKET)
+                        .upload(fileName, file);
 
-            if (error) {
-                alert('Gagal menyimpan: ' + error.message);
-            } else {
+                    if (uploadError) throw uploadError;
+
+                    // Get Public URL
+                    const { data: publicUrlData } = db.storage
+                        .from(STORAGE_BUCKET)
+                        .getPublicUrl(fileName);
+                    
+                    finalFileUrl = publicUrlData.publicUrl;
+                }
+                
+                // Jika user mengisi link manual dan TIDAK upload file, pakai link manual
+                if (fileInput.files.length === 0 && document.getElementById('link_referensi').value) {
+                    // Cek apakah link manual beda dengan existing file url (artinya user ganti link manual)
+                    const manualLink = document.getElementById('link_referensi').value;
+                    if (!manualLink.includes('/storage/')) {
+                        finalFileUrl = manualLink;
+                    }
+                }
+
+                // --- 2. SAVE DATA ---
+                saveBtn.innerText = 'Menyimpan Data...';
+
+                const formData = {
+                    jenis: document.getElementById('jenisInput').value || currentType,
+                    judul: document.getElementById('judul').value,
+                    deadline: document.getElementById('deadline').value || null,
+                    status: document.getElementById('status').value,
+                    target_jurnal: document.getElementById('target_jurnal').value,
+                    penulis: document.getElementById('penulis').value,
+                    // Kita simpan URL file atau Link manual di kolom link_referensi
+                    link_referensi: finalFileUrl, 
+                    biaya: document.getElementById('biaya').value,
+                    kategori: document.getElementById('kategori').value,
+                    catatan: document.getElementById('catatan').value,
+                    // Hidden fields mapping (prevent null overwrites if not in form)
+                    link_overleaf: document.getElementById('link_overleaf').value || null,
+                };
+
+                let error;
+                if (id) {
+                    const res = await db.from('papers').update(formData).eq('id', id);
+                    error = res.error;
+                } else {
+                    const res = await db.from('papers').insert([formData]);
+                    error = res.error;
+                }
+
+                if (error) throw error;
+
                 closeModal();
-                showToast('Data berhasil disimpan!');
+                showToast('Berhasil disimpan!');
                 fetchPapers();
+
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan: ' + (err.message || 'Cek console'));
+            } finally {
+                saveBtn.innerText = originalText;
+                saveBtn.disabled = false;
             }
         });
 
         async function deletePaper(id) {
-            if(!confirm('Yakin ingin menghapus data ini?')) return;
+            if(!confirm('Hapus data ini?')) return;
+            // Note: Idealnya kita juga hapus file di storage jika ada, tapi untuk simpelnya kita hapus record db saja dulu.
             const { error } = await db.from('papers').delete().eq('id', id);
-            if (error) {
-                alert('Gagal menghapus');
-            } else {
-                showToast('Data dihapus', 'error');
-                fetchPapers();
-            }
+            if (!error) { showToast('Terhapus'); fetchPapers(); }
         }
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-            toastMsg.textContent = message;
+        // --- FILTER & SORT (Reuse logic) ---
+        function populateCategoryFilter() {
+            const categories = [...new Set(papers.map(p => p.kategori).filter(k => k && k.trim() !== ''))].sort();
+            categoryFilter.innerHTML = '<option value="all">Semua Kategori</option>';
+            categories.forEach(c => categoryFilter.innerHTML += `<option value="${c}">${c}</option>`);
+            categoryFilter.value = currentFilterCategory;
+        }
+
+        function applyFiltersAndSort() {
+            let result = [...papers];
+            if (currentSearchTerm) result = result.filter(p => (p.judul||'').toLowerCase().includes(currentSearchTerm) || (p.penulis||'').toLowerCase().includes(currentSearchTerm));
+            if (currentFilterStatus !== 'all') result = result.filter(p => p.status === currentFilterStatus);
+            if (currentFilterCategory !== 'all') result = result.filter(p => p.kategori === currentFilterCategory);
             
-            if(type === 'error') {
-                toast.querySelector('i').className = 'fa-solid fa-circle-exclamation text-red-400';
-            } else {
-                toast.querySelector('i').className = 'fa-solid fa-circle-check text-green-400';
-            }
-
-            toast.classList.remove('translate-y-20');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20');
-            }, 3000);
+            result.sort((a, b) => {
+                if (currentSortOption === 'deadline_asc') return (new Date(a.deadline||'9999-12-31') - new Date(b.deadline||'9999-12-31'));
+                if (currentSortOption === 'deadline_desc') return (new Date(b.deadline||'1970-01-01') - new Date(a.deadline||'1970-01-01'));
+                if (currentSortOption === 'title_asc') return (a.judul||'').localeCompare(b.judul||'');
+                return 0;
+            });
+            renderTable(result);
         }
 
-        // --- 9. INIT ---
-        // Initialize default tab styling
-        switchType('Paper');
+        // Event Listeners
+        searchInput.addEventListener('input', (e) => { currentSearchTerm = e.target.value.toLowerCase(); applyFiltersAndSort(); });
+        statusFilter.addEventListener('change', (e) => { currentFilterStatus = e.target.value; applyFiltersAndSort(); });
+        categoryFilter.addEventListener('change', (e) => { currentFilterCategory = e.target.value; applyFiltersAndSort(); });
+        sortOption.addEventListener('change', (e) => { currentSortOption = e.target.value; applyFiltersAndSort(); });
+        function showToast(msg, type) { 
+            const t = document.getElementById('toast'); 
+            document.getElementById('toastMessage').innerText = msg; 
+            t.classList.remove('translate-y-20'); 
+            setTimeout(() => t.classList.add('translate-y-20'), 3000); 
+        }
 
+        // Init
+        switchType('Paper');
     </script>
 </body>
 </html>
